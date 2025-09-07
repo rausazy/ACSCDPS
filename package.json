@@ -25,6 +25,7 @@
         "test": "tests"
     },
     "dependencies": {
+        "@vitejs/plugin-react": "^5.0.2",
         "ansi-regex": "^5.0.1",
         "ansi-styles": "^4.3.0",
         "asynckit": "^0.4.0",
@@ -81,6 +82,9 @@
         "picomatch": "^4.0.3",
         "postcss-value-parser": "^4.2.0",
         "proxy-from-env": "^1.1.0",
+        "react": "^19.1.1",
+        "react-dom": "^19.1.1",
+        "recharts": "^3.1.2",
         "require-directory": "^2.1.1",
         "rollup": "^4.50.0",
         "rxjs": "^7.8.2",

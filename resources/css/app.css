@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    @apply min-h-screen flex flex-col bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(currentColor 1px, transparent 1px);
+    background-size: 20px 20px;
+    color: rgba(0, 0, 0, 0.05); /* kulay ng dots */
+    pointer-events: none; /* para hindi maka-interact */
+    z-index: 0;
+}
+
+main, #app {
+    position: relative;
+    z-index: 10; /* para laging nasa ibabaw yung laman */
+}
+

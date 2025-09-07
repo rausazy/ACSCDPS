@@ -5,7 +5,12 @@ export default {
     "./resources/**/*.vue",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        navbar: "#9C89B8",
+        footer: "#9C89B8",
+      },
+    },
   },
   plugins: [],
-}
+};
