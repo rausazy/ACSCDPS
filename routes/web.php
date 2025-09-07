@@ -2,15 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Home page
 Route::get('/', function () {
-    return view('home');
+    return view('home'); 
 });
 
+// Example static pages
 Route::get('/products', function () {
-    return view('products');
+    return view('products'); 
 });
 
 Route::get('/services', function () {
-    return view('services');
+    return view('services'); 
 });
 
+Route::get('/profile', function () {
+    return view('profile'); 
+});

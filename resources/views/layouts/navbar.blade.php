@@ -66,13 +66,16 @@
                             </svg>
                             Settings
                         </a>
-                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
+
+                      <a href="#"
+                        class="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
                             <!-- Logout icon -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h6a1 1 0 010 2H5v10h5a1 1 0 110 2H4a1 1 0 01-1-1V4zm10.707 5.293a1 1 0 010 1.414L11.414 13H9a1 1 0 110-2h2.414l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h6a1 1 0 010 2H5v10h5a1 1 0 110 2H4a1 1 0 01-1-1V4zm10.707 5.293a1 1 0 010 1.414L11.414 13H9a1 1 0 110-2h2.414l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                             </svg>
                             Sign out
                         </a>
+                        </form>
                     </div>
                 </div>
             </div>
