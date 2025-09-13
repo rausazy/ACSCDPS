@@ -1,25 +1,40 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\LoginController;
 
-// Home page
-Route::get('/', function () {
-    return view('home'); 
+// Protektadong pages → kailangan naka-login lahat kasama ang home
+Route::middleware('auth')->group(function () {
+    Route::get('/', function () {
+        return view('home'); 
+    });
+
+    Route::get('/products', function () {
+        return view('products'); 
+    });
+
+    Route::get('/services', function () {
+        return view('services'); 
+    });
+
+    Route::get('/profile', function () {
+        return view('profile'); 
+    });
+
+    Route::get('/stocks', function () {
+        return view('stocks'); 
+    });
 });
 
-// Example static pages
-Route::get('/products', function () {
-    return view('products'); 
-});
+// Login / Register routes → accessible kahit logout
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
+Route::post('/login', [LoginController::class, 'login'])->name('login');
 
-Route::get('/services', function () {
-    return view('services'); 
-});
+Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register.form');
+Route::post('/register', [LoginController::class, 'register'])->name('register');
 
-Route::get('/profile', function () {
-    return view('profile'); 
-});
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/login', function () {
-    return view('login'); 
-});
+
+

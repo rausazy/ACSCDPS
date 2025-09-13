@@ -19,32 +19,6 @@
 
     <!-- Stats Boxes -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mb-16">
-        <!-- Total Cost -->
-        <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition transform hover:scale-105">
-            <div class="flex items-center space-x-6">
-                <div class="p-5 rounded-full bg-purple-100 text-purple-600">
-                    <x-heroicon-o-currency-dollar class="w-12 h-12" />
-                </div>
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-700">Total Cost</h2>
-                    <p class="text-4xl font-extrabold text-gray-900">₱120,000</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Products Available -->
-        <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition transform hover:scale-105">
-            <div class="flex items-center space-x-6">
-                <div class="p-5 rounded-full bg-blue-100 text-blue-600">
-                    <x-heroicon-o-archive-box class="w-12 h-12" />
-                </div>
-                <div>
-                    <h2 class="text-xl font-semibold text-gray-700">Products Available</h2>
-                    <p class="text-4xl font-extrabold text-gray-900">320</p>
-                </div>
-            </div>
-        </div>
-
         <!-- Total Revenue -->
         <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition transform hover:scale-105">
             <div class="flex items-center space-x-6">
@@ -57,14 +31,82 @@
                 </div>
             </div>
         </div>
+
+        <!-- Total Expenses -->
+        <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition transform hover:scale-105">
+            <div class="flex items-center space-x-6">
+                <div class="p-5 rounded-full bg-purple-100 text-purple-600">
+                    <x-heroicon-o-currency-dollar class="w-12 h-12" />
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700">Total Expenses</h2>
+                    <p class="text-4xl font-extrabold text-gray-900">₱120,000</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Net Income -->
+        <div class="bg-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition transform hover:scale-105">
+            <div class="flex items-center space-x-6">
+                <div class="p-5 rounded-full bg-indigo-100 text-indigo-600">
+                    <x-heroicon-o-banknotes class="w-12 h-12" />
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700">Total Net Income</h2>
+                    <p class="text-4xl font-extrabold text-gray-900">₱300,000</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Analytics Section -->
+    <!-- Low Stock + Best Seller -->
+    <div class="w-full max-w-6xl mb-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Low on Stock -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">⚠️ Low on Stock</h2>
+                <ul class="divide-y divide-gray-200">
+                    <li class="flex justify-between items-center py-2 text-gray-700">
+                        <span>Paper</span>
+                        <span class="text-red-600 font-semibold">5 left</span>
+                    </li>
+                    <li class="flex justify-between items-center py-2 text-gray-700">
+                        <span>Shirts</span>
+                        <span class="text-red-600 font-semibold">8 left</span>
+                    </li>
+                    <li class="flex justify-between items-center py-2 text-gray-700">
+                        <span>Ink</span>
+                        <span class="text-red-600 font-semibold">3 left</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Best Seller -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">⭐ Best Seller</h2>
+                <ul class="divide-y divide-gray-200">
+                    <li class="flex justify-between items-center py-2 text-gray-700">
+                        <span>Custom T-Shirt</span>
+                        <span class="text-gray-500">120 sold</span>
+                    </li>
+                    <li class="flex justify-between items-center py-2 text-gray-700">
+                        <span>Premium Ink Pack</span>
+                        <span class="text-gray-500">95 sold</span>
+                    </li>
+                    <li class="flex justify-between items-center py-2 text-gray-700">
+                        <span>A4 Glossy Paper</span>
+                        <span class="text-gray-500">80 sold</span>
+                    </li>
+                </ul>
+            </div>
+        </div> <!-- ✅ close grid dito -->
+    </div> <!-- ✅ close wrapper ng 2 boxes -->
+
+    <!-- Analytics Section (hindi na compressed) -->
     <div class="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-8">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">📊 Monthly Analytics</h2>
         <div class="h-80 flex items-center justify-center text-gray-500 italic">
             Analytics chart will be displayed here once data is available.
         </div>
     </div>
-</div>
 @endsection

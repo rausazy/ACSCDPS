@@ -30,57 +30,65 @@
                 </div>
                 <div class="hidden sm:ml-6 sm:block">
                     <div class="flex space-x-4">
-                        <a href="{{ url('/') }}" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-white/20 hover:text-gray-900">Home</a>
-                        <a href="{{ url('/products') }}" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-white/20 hover:text-gray-900">Products</a>
-                        <a href="{{ url('/services') }}" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-white/20 hover:text-gray-900">Services</a>
+                        <a href="{{ url('/') }}"
+                           class="{{ request()->is('/') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
+                            Home
+                        </a>
+                        <a href="{{ url('/products') }}"
+                           class="{{ request()->is('products*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
+                            Products
+                        </a>
+                        <a href="{{ url('/services') }}"
+                           class="{{ request()->is('services*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
+                            Services
+                        </a>
+                        <a href="{{ url('/stocks') }}"
+                           class="{{ request()->is('stocks*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
+                            Stocks
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Profile dropdown -->
-            <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                <div class="relative ml-3">
-                    <button type="button"
-                            class="flex rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            id="user-menu-button">
-                        <span class="sr-only">Open user menu</span>
-                        <img class="h-8 w-8 rounded-full bg-gray-800"
-                             src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                             alt="">
-                    </button>
+<!-- Profile dropdown -->
+<div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+    <div class="relative ml-3">
+        <button type="button"
+                class="flex items-center justify-center rounded-full bg-gray-800 h-8 w-8 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                id="user-menu-button">
+            <span class="sr-only">Open user menu</span>
+            <!-- Optional: initials or icon can go here -->
+        </button>
 
-                    <!-- Dropdown menu -->
-                    <div id="user-menu"
-                         class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 hidden transform transition-all duration-200 ease-out scale-95 opacity-0">
-                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                            <!-- Profile icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 2a5 5 0 00-5 5v1a5 5 0 1010 0V7a5 5 0 00-5-5zm-7 14a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                            </svg>
-                            Your Profile
-                        </a>
-                        <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                            <!-- Settings icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M11.3 1.046a1 1 0 00-2.6 0L8.293 2.5a1 1 0 01-.832.445H5.25a1 1 0 100 2h2.211a1 1 0 01.832.445l.407.954a1 1 0 001.794 0l.407-.954a1 1 0 01.832-.445H14.75a1 1 0 100-2h-2.211a1 1 0 01-.832-.445L11.3 1.046zM10 6a4 4 0 00-4 4v4a4 4 0 108 0v-4a4 4 0 00-4-4z" clip-rule="evenodd" />
-                            </svg>
-                            Settings
-                        </a>
+        <!-- Dropdown menu -->
+        <div id="user-menu"
+             class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md 
+                    bg-purple-600 
+                    py-1 shadow-lg ring-1 ring-black ring-opacity-5 hidden transform transition-all duration-200 ease-out scale-95 opacity-0">
+            <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/20 rounded">
+                <!-- Profile icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4
+                    v2h16v-2c0-2.66-5.33-4-8-4z" clip-rule="evenodd" />
+                </svg>
+                Your Profile
+            </a>
 
-                      <a href="#"
-                        class="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">
-                            <!-- Logout icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h6a1 1 0 010 2H5v10h5a1 1 0 110 2H4a1 1 0 01-1-1V4zm10.707 5.293a1 1 0 010 1.414L11.414 13H9a1 1 0 110-2h2.414l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                            Sign out
-                        </a>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <!-- Logout form -->
+            <form action="{{ route('logout') }}" method="POST" class="flex items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/20 rounded">
+                @csrf
+                <!-- Logout icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16 13v-2H7V8l-5 4 5 4v-3h9zM20 3H9c-1.1 0-2 
+                    .9-2 2v4h2V5h11v14H9v-4H7v4c0 1.1.9 2 2 
+                    2h11c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" clip-rule="evenodd"/>
+                </svg>
+                <button type="submit" class="ml-2">Logout</button>
+            </form>
         </div>
     </div>
+</div>
+
 
     <!-- Mobile menu (slide-in) -->
     <div id="mobile-menu"
@@ -92,23 +100,21 @@
             </button>
         </div>
         <div class="mt-4 space-y-2 px-4">
-            <a href="{{ url('/') }}" class="flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-white/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.707 1.293a1 1 0 00-1.414 0l-8 8a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h10a1 1 0 001-1v-6.586l1.293 1.293a1 1 0 001.414-1.414l-8-8z"/>
-                </svg>
+            <a href="{{ url('/') }}"
+               class="{{ request()->is('/') ? 'bg-white/20 text-gray-900' : 'text-gray-900 hover:bg-white/20' }} flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium">
                 Home
             </a>
-            <a href="{{ url('/products') }}" class="flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-white/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M4 3a2 2 0 00-2 2v2a2 2 0 002 2v6a2 2 0 002 2h8a2 2 0 002-2V9a2 2 0 002-2V5a2 2 0 00-2-2H4z"/>
-                </svg>
+            <a href="{{ url('/products') }}"
+               class="{{ request()->is('products*') ? 'bg-white/20 text-gray-900' : 'text-gray-900 hover:bg-white/20' }} flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium">
                 Products
             </a>
-            <a href="{{ url('/services') }}" class="flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium text-gray-900 hover:bg-white/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11V5a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0V9h2a1 1 0 100-2h-2z" clip-rule="evenodd" />
-                </svg>
+            <a href="{{ url('/services') }}"
+               class="{{ request()->is('services*') ? 'bg-white/20 text-gray-900' : 'text-gray-900 hover:bg-white/20' }} flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium">
                 Services
+            </a>
+            <a href="{{ url('/stocks') }}"
+               class="{{ request()->is('stocks*') ? 'bg-white/20 text-gray-900' : 'text-gray-900 hover:bg-white/20' }} flex items-center gap-2 rounded-md px-3 py-2 text-base font-medium">
+                Stocks
             </a>
         </div>
     </div>
