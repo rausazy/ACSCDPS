@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen flex flex-col items-center py-16 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen flex flex-col items-center py-16">
 
     <!-- Success Banner -->
     @if(session('success'))
@@ -13,7 +13,7 @@
     @endif
 
     <!-- Header -->
-    <div class="text-left mb-14 w-full flex justify-between items-center">
+    <div class="flex items-center justify-between w-full max-w-7xl mb-14 px-4 sm:px-6 lg:px-8">
         <div>
             <h1 class="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent 
                bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 
@@ -24,15 +24,21 @@
                 Discover our wide range of customizable products.
             </p>
         </div>
-        <!-- Open Modal Button -->
+
+        <!-- Add Product Button (like Stocks) -->
         <button id="open-modal" 
-            class="ml-4 rounded-lg bg-purple-600 text-white px-4 py-2 font-semibold hover:bg-purple-700 transition">
-            + Add Product
+            class="flex items-center justify-center gap-2 px-10 py-3 
+                   rounded-xl bg-white border-1 border-black 
+                   text-gray-900 font-bold shadow-md 
+                   hover:bg-purple-100 hover:shadow-lg 
+                   transition transform hover:-translate-y-1 hover:scale-105">
+            <span class="text-lg font-bold">+</span>
+            <span class="text-sm">Add Product</span>
         </button>
     </div>
 
     <!-- Products Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 w-full max-w-7xl">
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         @foreach ($products as $product)
         <div class="relative group">
             <!-- Delete Button -->
@@ -74,7 +80,7 @@
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform scale-95 transition-transform duration-300">
         <h2 class="text-2xl font-bold mb-4">Add Product</h2>
 
-        {{-- Error Banner (Duplicate name, etc.) --}}
+        {{-- Error Banner --}}
         @if ($errors->any())
             <div id="error-banner" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative transition-opacity duration-500">
                 {{ $errors->first() }}

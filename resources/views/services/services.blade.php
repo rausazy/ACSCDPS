@@ -13,8 +13,8 @@
     @endif
 
     <!-- Header -->
-    <div class="mb-14 w-full flex justify-between items-start">
-        <div class="text-left max-w-2xl">
+    <div class="flex items-center justify-between w-full max-w-7xl mb-14 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl">
             <h1 class="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent 
                bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 
                leading-tight pb-2">
@@ -25,10 +25,15 @@
             </p>
         </div>
 
-        <!-- Open Modal Button -->
+        <!-- Add Service Button (like Stocks) -->
         <button id="open-modal" 
-            class="ml-4 rounded-lg bg-purple-600 text-white px-4 py-2 font-semibold hover:bg-purple-700 transition">
-            + Add Service
+            class="flex items-center justify-center gap-2 px-10 py-3 
+                   rounded-xl bg-white border-1 border-black 
+                   text-gray-900 font-bold shadow-md 
+                   hover:bg-purple-100 hover:shadow-lg 
+                   transition transform hover:-translate-y-1 hover:scale-105">
+            <span class="text-lg font-bold">+</span>
+            <span class="text-sm">Add Service</span>
         </button>
     </div>
 
@@ -125,17 +130,6 @@
     </div>
 </div>
 
-<script>
-    // ----- ERROR BANNER AUTO-HIDE -----
-    const errorBanner = document.getElementById('error-banner');
-    if (errorBanner) {
-        setTimeout(() => {
-            errorBanner.classList.add('opacity-0');
-            setTimeout(() => errorBanner.remove(), 500);
-        }, 2000); // 2s stay
-    }
-</script>
-
 <!-- Delete Confirmation Modal -->
 <div id="delete-modal" class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 z-50">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform scale-95 transition-transform duration-300">
@@ -149,6 +143,15 @@
 </div>
 
 <script>
+    // ----- ERROR BANNER AUTO-HIDE -----
+    const errorBanner = document.getElementById('error-banner');
+    if (errorBanner) {
+        setTimeout(() => {
+            errorBanner.classList.add('opacity-0');
+            setTimeout(() => errorBanner.remove(), 500);
+        }, 2000);
+    }
+
     // ----- SUCCESS BANNER FADE-IN/OUT -----
     ['success-banner'].forEach(id => {
         const banner = document.getElementById(id);
