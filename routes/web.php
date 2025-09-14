@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
-
-// Protektadong pages → kailangan naka-login lahat kasama ang home
+use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\StocksController;
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         return view('home'); 
@@ -27,7 +28,6 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-// Login / Register routes → accessible kahit logout
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
@@ -35,6 +35,27 @@ Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('reg
 Route::post('/register', [LoginController::class, 'register'])->name('register');
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/products', [ProductsController::class, 'index'])->name('products.products');
+    Route::get('/products/create', [ProductsController::class, 'create'])->name('products.create');
+    Route::post('/products', [ProductsController::class, 'store'])->name('products.store');
+    Route::delete('/products/{product}', [ProductsController::class, 'destroy'])->name('products.destroy')->middleware('auth');
+    Route::get('/products/{url}', [ProductsController::class, 'show'])->name('products.show');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/services', [ServiceController::class, 'index'])->name('services.services');
+    Route::get('/services/create', [ServiceController::class, 'create'])->name('services.create');
+    Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
+    Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy')->middleware('auth');
+    Route::get('/services/{url}', [ServiceController::class, 'show'])->name('services.show');
+});
+
+    
+Route::get('/stocks', [StocksController::class, 'index'])->name('stocks.stocks');
+
+
 
 
 

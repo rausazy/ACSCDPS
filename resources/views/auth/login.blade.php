@@ -6,7 +6,11 @@
     [background-size:20px_20px,_cover] px-4">
 
     <div class="sm:mx-auto sm:w-full sm:max-w-lg">
-        <img src="{{ asset('images/CinleiLogo.png') }}" alt="Logo" class="mx-auto h-20 w-auto" />
+        <!-- Logo with white circle + shadow -->
+        <div class="mx-auto bg-white rounded-full p-4 w-fit shadow-md">
+            <img src="{{ asset('images/CinleiLogo.png') }}" alt="Logo" class="mx-auto h-20 w-auto" />
+        </div>
+
         <h2 class="mt-2 text-center text-3xl font-extrabold text-purple-600 tracking-tight">
             <span id="form-title">Sign in to your account</span>
         </h2>

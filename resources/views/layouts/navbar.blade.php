@@ -23,32 +23,32 @@
                 </button>
             </div>
 
-            <!-- Logo + Links (Desktop) -->
-            <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div class="flex shrink-0 items-center">
-                    <img src="{{ asset('images/CinleiLogo.png') }}" alt="Your Company" class="h-8 w-auto"/>
-                </div>
-                <div class="hidden sm:ml-6 sm:block">
-                    <div class="flex space-x-4">
-                        <a href="{{ url('/') }}"
-                           class="{{ request()->is('/') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
-                            Home
-                        </a>
-                        <a href="{{ url('/products') }}"
-                           class="{{ request()->is('products*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
-                            Products
-                        </a>
-                        <a href="{{ url('/services') }}"
-                           class="{{ request()->is('services*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
-                            Services
-                        </a>
-                        <a href="{{ url('/stocks') }}"
-                           class="{{ request()->is('stocks*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
-                            Stocks
-                        </a>
-                    </div>
-                </div>
-            </div>
+<!-- Logo + Links (Desktop) -->
+<div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+    <div class="flex shrink-0 items-center bg-white rounded-full p-1 shadow-md">
+        <img src="{{ asset('images/CinleiLogo.png') }}" alt="Your Company" class="h-8 w-auto"/>
+    </div>
+    <div class="hidden sm:ml-6 sm:block">
+        <div class="flex space-x-4">
+            <a href="{{ url('/') }}"
+               class="{{ request()->is('/') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
+                Home
+            </a>
+            <a href="{{ url('/products') }}"
+               class="{{ request()->is('products*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
+                Products
+            </a>
+            <a href="{{ url('/services') }}"
+               class="{{ request()->is('services*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
+                Services
+            </a>
+            <a href="{{ url('/stocks') }}"
+               class="{{ request()->is('stocks*') ? 'bg-white/20 text-gray-900' : 'text-gray-700 hover:bg-white/20 hover:text-gray-900' }} rounded-md px-3 py-2 text-sm font-medium">
+                Stocks
+            </a>
+        </div>
+    </div>
+</div>
 
 <!-- Profile dropdown -->
 <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
