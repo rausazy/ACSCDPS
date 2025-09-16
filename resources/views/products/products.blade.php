@@ -13,32 +13,32 @@
     @endif
 
     <!-- Header -->
-    <div class="flex items-center justify-between w-full max-w-7xl mb-14 px-4 sm:px-6 lg:px-8">
-        <div>
-            <h1 class="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent 
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full max-w-7xl mb-14 px-4 sm:px-6 lg:px-8">
+        <div class="mb-6 sm:mb-0 text-center sm:text-left">
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent 
                bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 
                leading-tight pb-2">
                 Our Products
             </h1>
-            <p class="mt-4 text-lg text-gray-700 max-w-2xl leading-relaxed">
+            <p class="mt-2 sm:mt-4 text-sm sm:text-lg text-gray-700 max-w-2xl leading-relaxed">
                 Discover our wide range of customizable products.
             </p>
         </div>
 
         <!-- Add Product Button (like Stocks) -->
         <button id="open-modal" 
-            class="flex items-center justify-center gap-2 px-10 py-3 
+            class="flex items-center justify-center gap-2 px-4 py-2 sm:px-10 sm:py-3 
                    rounded-xl bg-white border-1 border-black 
                    text-gray-900 font-bold shadow-md 
                    hover:bg-purple-100 hover:shadow-lg 
                    transition transform hover:-translate-y-1 hover:scale-105">
-            <span class="text-lg font-bold">+</span>
-            <span class="text-sm">Add Product</span>
+            <span class="text-lg sm:text-lg font-bold">+</span>
+            <span class="text-xs sm:text-sm">Add Product</span>
         </button>
     </div>
 
     <!-- Products Grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         @foreach ($products as $product)
         <div class="relative group">
             <!-- Delete Button -->
@@ -62,10 +62,10 @@
                 <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition duration-500 blur-sm"></div>
                 
                 <!-- inner white box -->
-                <div class="relative bg-white rounded-2xl shadow-md group-hover:shadow-2xl p-6 sm:p-8 flex flex-col items-center text-center transition duration-500">
+                <div class="relative bg-white rounded-2xl shadow-md group-hover:shadow-2xl p-4 sm:p-6 flex flex-col items-center text-center transition duration-500">
                     <x-dynamic-component :component="'heroicon-o-' . $product->icon" 
-                        class="w-12 h-12 {{ $product->color }} mb-3 transition-transform duration-500 group-hover:scale-110" />
-                    <h2 class="text-lg font-semibold text-gray-800">
+                        class="w-10 h-10 sm:w-12 sm:h-12 {{ $product->color }} mb-3 transition-transform duration-500 group-hover:scale-110" />
+                    <h2 class="text-base sm:text-lg font-semibold text-gray-800">
                         {{ $product->name }}
                     </h2>
                 </div>
@@ -77,7 +77,7 @@
 
 <!-- Add Product Modal -->
 <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform scale-95 transition-transform duration-300">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-xs sm:max-w-md p-4 sm:p-6 transform scale-95 transition-transform duration-300">
         <h2 class="text-2xl font-bold mb-4">Add Product</h2>
 
         {{-- Error Banner --}}
@@ -92,7 +92,7 @@
             <div class="mb-4">
                 <label class="block text-gray-700 font-medium mb-1">Product Name</label>
                 <input type="text" name="name" required
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700 font-medium mb-1">Icon</label>
@@ -119,19 +119,19 @@
                 asort($icons);
                 @endphp
 
-                <select name="icon" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                <select name="icon" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
                     @foreach($icons as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="flex justify-end space-x-2 mt-6">
+            <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-6">
                 <button type="button" id="cancel-modal"
-                    class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition">
+                    class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto text-sm sm:text-base">
                     Cancel
                 </button>
                 <button type="submit"
-                    class="px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition">
+                    class="px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition w-full sm:w-auto text-sm sm:text-base">
                     Add Product
                 </button>
             </div>
@@ -141,12 +141,12 @@
 
 <!-- Delete Confirmation Modal -->
 <div id="delete-modal" class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 z-50">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 transform scale-95 transition-transform duration-300">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-xs sm:max-w-md p-4 sm:p-6 transform scale-95 transition-transform duration-300">
         <h2 class="text-xl font-bold mb-4">Delete Product</h2>
-        <p class="mb-4" id="delete-product-name">Are you sure you want to delete this product?</p>
-        <div class="flex justify-end space-x-2">
-            <button type="button" id="cancel-delete" class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition">Cancel</button>
-            <button type="button" id="confirm-delete" class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition">Delete</button>
+        <p class="mb-4 text-sm sm:text-base" id="delete-product-name">Are you sure you want to delete this product?</p>
+        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
+            <button type="button" id="cancel-delete" class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto text-sm sm:text-base">Cancel</button>
+            <button type="button" id="confirm-delete" class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition w-full sm:w-auto text-sm sm:text-base">Delete</button>
         </div>
     </div>
 </div>
