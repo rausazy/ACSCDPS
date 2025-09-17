@@ -31,6 +31,9 @@ Route::middleware('auth')->group(function () {
 
     // Stocks
     Route::get('/stocks', [StocksController::class, 'index'])->name('stocks.stocks');
+    Route::get('/stocks/{stock}', [StocksController::class, 'show'])->name('stocks.show');
+    Route::post('/stocks', [StocksController::class, 'store'])->name('stocks.store');
+    Route::put('/stocks/{stock}', [StocksController::class, 'update'])->name('stocks.update');
 
     // Products
     Route::get('/products', [ProductsController::class, 'index'])->name('products.products');

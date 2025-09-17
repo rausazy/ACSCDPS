@@ -12,7 +12,15 @@ class Product extends Model
     protected $fillable = ['name', 'icon', 'url', 'color'];
 
     public function stock()
-{
-    return $this->morphOne(Stock::class, 'stockable');
-}
+    {
+        return $this->morphOne(Stock::class, 'stockable');
+    }
+
+    /**
+     * Accessor para consistent display name
+     */
+    public function getDisplayNameAttribute()
+    {
+        return $this->name; // column name sa products table
+    }
 }
