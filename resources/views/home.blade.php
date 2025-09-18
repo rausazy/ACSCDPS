@@ -8,14 +8,14 @@
         <h1 class="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent 
            bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 
            leading-tight pb-2">
-            Welcome to Cinlei Automated Costing
+            Cinlei Digital Printing Services
         </h1>
         <p class="mt-4 text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
             We provide <span class="font-semibold text-purple-600">top-quality products</span> and 
             <span class="font-semibold text-pink-500">professional services</span> 
             designed to help your business grow and succeed.
         </p>
-    </div>
+    </div>  
 
     <!-- Stats Boxes -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mb-16">
