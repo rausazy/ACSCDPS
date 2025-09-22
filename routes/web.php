@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\StocksController;
+use App\Http\Controllers\RawMaterialController; // <── added
 
 // ----- GUEST ROUTES -----
 Route::middleware('guest')->group(function () {
@@ -34,6 +35,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/stocks/{stock}', [StocksController::class, 'show'])->name('stocks.show');
     Route::post('/stocks', [StocksController::class, 'store'])->name('stocks.store');
     Route::put('/stocks/{stock}', [StocksController::class, 'update'])->name('stocks.update');
+
+    // Raw Materials (inside a stock)
+    Route::post('/stocks/{stock}/raw-materials', [RawMaterialController::class, 'store'])->name('raw-materials.store');
+
 
     // Products
     Route::get('/products', [ProductsController::class, 'index'])->name('products.products');

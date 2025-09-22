@@ -33,20 +33,39 @@
 
     <!-- Buttons -->
     <div class="w-full max-w-7xl flex justify-end mb-14 space-x-3">
-        <button onclick="document.getElementById('addStockModal').classList.remove('hidden')" 
+        <button onclick="document.getElementById('addRawModal').classList.remove('hidden')" 
             class="flex items-center justify-center gap-2 px-6 py-2 
                    rounded-xl bg-gray-500 text-white font-bold shadow-md 
                    hover:bg-gray-600 hover:shadow-lg 
                    transition transform hover:-translate-y-1 hover:scale-105">
-            + Add New
+            + Add Raw Material
         </button>
     </div>
 
-    <!-- Add New Stock Modal -->
-    <div id="addStockModal" 
+    <!-- Raw Materials List -->
+    <div class="w-full max-w-7xl">
+        <h2 class="text-2xl font-bold mb-4">Raw Materials</h2>
+
+        @if($stock->rawMaterials->count())
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                @foreach($stock->rawMaterials as $raw)
+                    <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800">{{ $raw->name }}</h3>
+                        <p class="text-sm text-gray-500">Quantity: {{ $raw->quantity }}</p>
+                        <p class="text-sm text-gray-500">Price: ₱{{ number_format($raw->price, 2) }}</p>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-gray-500">No raw materials added yet.</p>
+        @endif
+    </div>
+
+    <!-- Add Raw Material Modal -->
+    <div id="addRawModal" 
          class="hidden fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-xs sm:max-w-md p-4 sm:p-6">
-            <h2 class="text-2xl font-bold mb-4">Add New Stock</h2>
+            <h2 class="text-2xl font-bold mb-4">Add Raw Material</h2>
 
             <!-- Session Success Banner -->
             @if(session('success'))
@@ -55,53 +74,50 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('stocks.store') }}">
-                @csrf
+            <!-- Validation Errors -->
+            @if ($errors->any())
+                <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+                    <ul class="list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                <!-- Stock Name -->
+            <!-- Form -->
+            <form method="POST" action="{{ route('raw-materials.store', $stock->id) }}">
+                @csrf
+                <!-- stock_id hidden -->
+                <input type="hidden" name="stock_id" value="{{ $stock->id }}">
+
+                <!-- Raw Material Name -->
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-1">Name</label>
                     <input type="text" name="name" value="{{ old('name') }}" required
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base">
                 </div>
 
-                <!-- Has Sizes Toggle -->
-                <div class="mb-4 flex items-center space-x-2">
-                    <input type="checkbox" id="hasSizesToggle" class="h-4 w-4 text-green-600" {{ old('has_sizes') ? 'checked' : '' }}>
-                    <label for="hasSizesToggle" class="text-gray-700 font-medium">Has Sizes?</label>
-                </div>
-
-                <!-- Sizes Inputs -->
-                <div id="sizesContainer" class="hidden mb-4 space-y-3 border border-gray-200 p-3 rounded-md">
-                    <p class="text-gray-600 text-sm mb-2">Enter sizes and their quantities:</p>
-                    <div id="sizeFields">
-                        <div class="flex items-center space-x-2">
-                            <input type="text" name="sizes[0][size_name]" placeholder="Size e.g. S, M, L" class="flex-1 border border-gray-300 rounded-md px-2 py-1 text-sm">
-                            <input type="number" name="sizes[0][quantity]" placeholder="Quantity" min="0" class="w-24 border border-gray-300 rounded-md px-2 py-1 text-sm">
-                            <button type="button" class="text-red-500 font-bold remove-size">&times;</button>
-                        </div>
-                    </div>
-                    <button type="button" id="addSize" class="mt-2 px-3 py-1 bg-gray-200 rounded-md text-sm hover:bg-gray-300">+ Add Size</button>
-                </div>
-
-                <!-- Single Quantity -->
-                <div id="singleQuantity" class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-1">Quantity</label>
-                    <input type="number" name="quantity" value="{{ old('quantity') }}" required min="0" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base">
-                </div>
-
-                <!-- Price per Piece -->
+                <!-- Quantity -->
                 <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-1">Price per Piece</label>
-                    <input type="number" step="0.01" name="price" value="{{ old('price') }}" required min="0" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base">
+                    <label class="block text-gray-700 font-medium mb-1">Quantity</label>
+                    <input type="number" name="quantity" value="{{ old('quantity') }}" required min="0"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base">
+                </div>
+
+                <!-- Price -->
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-1">Price</label>
+                    <input type="number" step="0.01" name="price" value="{{ old('price') }}" required min="0"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base">
                 </div>
 
                 <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-6">
-                    <button type="button" onclick="document.getElementById('addStockModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto">
+                    <button type="button" onclick="document.getElementById('addRawModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto">
                         Cancel
                     </button>
                     <button type="submit" class="px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-gray-600 transition w-full sm:w-auto">
-                        Add Stock
+                        Add Raw Material
                     </button>
                 </div>
             </form>
@@ -109,36 +125,4 @@
     </div>
 
 </div>
-
-<script>
-    const hasSizesToggle = document.getElementById('hasSizesToggle');
-    const sizesContainer = document.getElementById('sizesContainer');
-    const singleQuantity = document.getElementById('singleQuantity');
-
-    hasSizesToggle.addEventListener('change', () => {
-        sizesContainer.classList.toggle('hidden', !hasSizesToggle.checked);
-        singleQuantity.classList.toggle('hidden', hasSizesToggle.checked);
-    });
-
-    // Add/remove dynamic size fields
-    let sizeIndex = 1;
-    document.getElementById('addSize').addEventListener('click', function(){
-        const container = document.getElementById('sizeFields');
-        const div = document.createElement('div');
-        div.className = 'flex items-center space-x-2 mt-1';
-        div.innerHTML = `
-            <input type="text" name="sizes[${sizeIndex}][size_name]" placeholder="Size e.g. S, M, L" class="flex-1 border border-gray-300 rounded-md px-2 py-1 text-sm">
-            <input type="number" name="sizes[${sizeIndex}][quantity]" placeholder="Quantity" min="0" class="w-24 border border-gray-300 rounded-md px-2 py-1 text-sm">
-            <button type="button" class="text-red-500 font-bold remove-size">&times;</button>
-        `;
-        container.appendChild(div);
-        sizeIndex++;
-
-        div.querySelector('.remove-size').addEventListener('click', () => div.remove());
-    });
-
-    document.querySelectorAll('.remove-size').forEach(btn => {
-        btn.addEventListener('click', e => e.target.parentElement.remove());
-    });
-</script>
 @endsection
