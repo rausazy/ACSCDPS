@@ -41,7 +41,6 @@ class ServiceController extends Controller
             'name'  => $request->name,
             'icon'  => $request->icon,
             'url'   => $url,
-            'color' => $color,
         ]);
 
         // ✅ Create corresponding Stock entry (default quantity 0)

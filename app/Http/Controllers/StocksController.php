@@ -11,7 +11,7 @@ class StocksController extends Controller
     // List all stocks
     public function index()
     {
-        $stocks = Stock::with(['stockable', 'sizes'])
+        $stocks = Stock::with(['stockable', 'sizes', 'rawMaterials']) // added rawMaterials
             ->get()
             ->sortBy(function ($stock) {
                 return strtolower($stock->stockable->name ?? $stock->name);
@@ -23,10 +23,13 @@ class StocksController extends Controller
     // Show page for individual stock
     public function show(Stock $stock)
     {
-        $stock->load(['stockable', 'sizes']);
-        $allStocks = Stock::with(['sizes'])->latest()->get(); // for listing all on the page
+        $stock->load(['stockable', 'sizes', 'rawMaterials']); // added rawMaterials
+        $allStocks = Stock::with(['sizes', 'rawMaterials'])->latest()->get(); // added rawMaterials
 
-        return view('stocks.show', compact('stock', 'allStocks'));
+        // overall quantity from raw materials
+        $totalQuantity = $stock->rawMaterials->sum('quantity');
+
+        return view('stocks.show', compact('stock', 'allStocks', 'totalQuantity'));
     }
 
     // Store new stock

@@ -40,7 +40,9 @@
                 </div>
                 <div>
                     <h2 class="text-xl font-semibold text-gray-700">Total Expenses</h2>
-                    <p class="text-4xl font-extrabold text-gray-900">₱120,000</p>
+                    <p class="text-4xl font-extrabold text-gray-900">
+                        ₱{{ number_format($overallExpenses ?? 0, 2) }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -99,8 +101,8 @@
                     </li>
                 </ul>
             </div>
-        </div> <!-- ✅ close grid dito -->
-    </div> <!-- ✅ close wrapper ng 2 boxes -->
+        </div>
+    </div>
 
     <!-- Analytics Section (hindi na compressed) -->
     <div class="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-8">
@@ -109,4 +111,5 @@
             Analytics chart will be displayed here once data is available.
         </div>
     </div>
+</div>
 @endsection

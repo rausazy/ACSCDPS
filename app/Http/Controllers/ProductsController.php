@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Stock;
 use Illuminate\Support\Str;
+use PDF;
 
 class ProductsController extends Controller
 {
@@ -47,7 +48,7 @@ public function store(Request $request)
     ]);
 
     // ✅ Create corresponding Stock entry with default quantity 0 via polymorphic relation
-    $product->stock()->create([
+    $product->stocks()->create([
         'quantity' => 0,
     ]);
 
@@ -68,9 +69,31 @@ public function store(Request $request)
         return redirect()->route('products.products')->with('success', 'Product successfully deleted!');
     }
 
-    public function show($url)
-    {
-        $product = Product::where('url', $url)->firstOrFail();
-        return view('products.show', compact('product'));
-    }
+   public function show($url)
+{
+    $product = Product::where('url', $url)->firstOrFail();
+
+    // Kunin raw materials ng stock ng product
+    $rawMaterials = $product->stock 
+        ? $product->stock->rawMaterials()->orderBy('name')->get() 
+        : collect();
+
+    return view('products.show', compact('product', 'rawMaterials'));
+
+    
+}
+
+public function exportPdf(Request $request, $url)
+{
+    $product = Product::where('url', $url)->firstOrFail();
+
+    $costingData = json_decode($request->costing_data, true);
+
+    $pdf = \PDF::loadView('products.costing-pdf', [
+        'product' => $product,
+        'costingData' => $costingData,
+    ]);
+
+    return $pdf->stream($product->name . '_costing.pdf');
+}
 }

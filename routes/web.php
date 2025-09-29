@@ -1,34 +1,25 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\StocksController;
-use App\Http\Controllers\RawMaterialController; // <── added
+use App\Http\Controllers\RawMaterialController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CostingController;
 
-// ----- GUEST ROUTES -----
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
     Route::post('/login', [LoginController::class, 'login'])->name('login');
-
     Route::get('/register', [LoginController::class, 'showRegisterForm'])->name('register.form');
     Route::post('/register', [LoginController::class, 'register'])->name('register');
 });
 
-// ----- AUTH ROUTES -----
 Route::middleware('auth')->group(function () {
-
-    // Home / Dashboard
-    Route::get('/', function () {
-        return view('home');
-    })->name('home');
-
-    // Profile
-    Route::get('/profile', function () {
-        return view('profile');
-    })->name('profile');
+    // Home
+    Route::get('/', fn () => view('home'))->name('home');
+    Route::get('/profile', fn () => view('profile'))->name('profile');
 
     // Stocks
     Route::get('/stocks', [StocksController::class, 'index'])->name('stocks.stocks');
@@ -36,9 +27,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/stocks', [StocksController::class, 'store'])->name('stocks.store');
     Route::put('/stocks/{stock}', [StocksController::class, 'update'])->name('stocks.update');
 
-    // Raw Materials (inside a stock)
+    // ✅ Raw Materials (nested sa Stock)
     Route::post('/stocks/{stock}/raw-materials', [RawMaterialController::class, 'store'])->name('raw-materials.store');
-
+    Route::put('/raw-materials/{rawMaterial}', [RawMaterialController::class, 'update'])->name('raw-materials.update');
+    Route::delete('/raw-materials/{rawMaterial}', [RawMaterialController::class, 'destroy'])->name('raw-materials.destroy');
 
     // Products
     Route::get('/products', [ProductsController::class, 'index'])->name('products.products');
@@ -56,4 +48,11 @@ Route::middleware('auth')->group(function () {
 
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+
+    Route::get('/costing/{product}', [CostingController::class, 'show'])->name('costing.show');
+    Route::post('/costing/{product}', [CostingController::class, 'store'])->name('costing.store');
+
+    Route::post('/products/{url}/costing/pdf', [ProductsController::class, 'exportPdf'])->name('products.costing.pdf');
 });

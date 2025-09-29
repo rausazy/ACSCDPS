@@ -36,7 +36,7 @@
                         {{ optional($stock->stockable)->name ?? $stock->name }}
                     </h2>
                     <p class="text-sm text-gray-500 mt-1">
-                        Quantity: {{ $stock->quantity }}
+                        Quantity: {{ $stock->rawMaterials->sum('quantity') }}
                     </p>
                 </div>
             </a>
