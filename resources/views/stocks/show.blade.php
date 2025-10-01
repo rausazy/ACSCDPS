@@ -40,14 +40,17 @@
         </div>
     </div>
 
-    <!-- Buttons -->
+    <!-- ✅ Buttons -->
     <div class="w-full max-w-7xl flex justify-end mb-14 space-x-3">
-        <button onclick="document.getElementById('addRawModal').classList.remove('hidden')" 
-            class="flex items-center justify-center gap-2 px-6 py-2 
-                   rounded-xl bg-gray-500 text-white font-bold shadow-md 
-                   hover:bg-gray-600 hover:shadow-lg 
+        <button 
+            onclick="document.getElementById('addRawModal').classList.remove('hidden')" 
+            class="flex items-center justify-center gap-2 px-4 py-2 sm:px-10 sm:py-3
+                   rounded-xl bg-white
+                   text-gray-900 font-bold shadow-md
+                   hover:bg-purple-100 hover:shadow-lg
                    transition transform hover:-translate-y-1 hover:scale-105">
-            + Add Raw Material
+            <span class="text-lg sm:text-lg font-bold">+</span>
+            <span class="text-xs sm:text-sm">Add Raw Material</span>
         </button>
     </div>
 
@@ -166,7 +169,7 @@
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
                 </div>
 
-                                <div class="mb-4">
+                <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-1">Price</label>
                     <input type="number" step="0.01" id="edit_price" name="price" min="0" required
                         class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base">
@@ -265,4 +268,3 @@
     }
 </script>
 @endsection
-

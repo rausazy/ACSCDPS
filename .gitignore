@@ -1,24 +1,41 @@
-*.log
-.DS_Store
-.env
+# Laravel sensitive files
+/.env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
 /auth.json
+
+# Laravel storage & runtime
+/storage/*.key
+/storage/logs
+/storage/framework/sessions
+/storage/framework/cache
+/storage/framework/views
+/public/storage
+
+# Dependencies
+/vendor
 /node_modules
+
+# Public build / mix files
 /public/build
 /public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
+
+# IDE / editor configs
+/.idea
+/.vscode
+/.phpactor.json
+/.fleet
+/.zed
+/.nova
+
+# OS / system files
+.DS_Store
+Thumbs.db
+
+# Testing
+.phpunit.result.cache
+/.phpunit.cache
+
+# Homestead
 Homestead.json
 Homestead.yaml
-Thumbs.db
