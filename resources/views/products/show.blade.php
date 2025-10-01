@@ -31,12 +31,15 @@
 
         <h2 class="text-2xl font-bold mb-4 flex justify-between items-center">
             Costing
+
             <!-- Export PDF Button Form -->
             <form id="pdfForm" method="POST" action="{{ route('products.costing.pdf', $product->url) }}" target="_blank">
                 @csrf
                 <input type="hidden" name="costing_data" id="costingDataInput">
                 <button type="submit" onclick="preparePdfData()" 
-                    class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
+                    class="px-4 py-2 bg-purple-600 text-white font-medium rounded-md 
+                        hover:bg-purple-700 transition-colors duration-200"
+                    style="background-color: rgb(147 51 234);"> <!-- bg-purple-600 -->
                     Export as PDF
                 </button>
             </form>
@@ -49,10 +52,18 @@
                 <select id="rawSelect" class="w-full border border-gray-300 rounded-md px-3 py-2">
                     <option value="">-- Choose Raw Material --</option>
                     @foreach($rawMaterials as $raw)
-                        <option value="{{ $raw->id }}" data-name="{{ $raw->name }}" data-price="0">{{ $raw->name }}</option>
+                        <option value="{{ $raw->id }}" 
+                                data-name="{{ $raw->name }}" 
+                                data-price="{{ $raw->price }}">
+                            {{ $raw->name }}
+                        </option>
                     @endforeach
                 </select>
-                <button type="button" id="addRawBtn" class="mt-2 px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600">Add</button>
+                <button type="button" id="addRawBtn" 
+                    class="px-4 py-2 text-white rounded-md font-medium hover:bg-purple-600 transition"
+                    style="background-color: rgb(139 92 246); margin-top: 12px !important; display: inline-block;">
+                    Add
+                </button>   
             </div>
 
             <table class="w-full table-auto border-collapse border border-gray-200">
@@ -62,7 +73,6 @@
                         <th class="border px-4 py-2 text-left">Quantity</th>
                         <th class="border px-4 py-2 text-left">Unit Price</th>
                         <th class="border px-4 py-2 text-left">Total Price</th>
-                        <th class="border px-4 py-2 text-left">Desired Profit</th>
                         <th class="border px-4 py-2 text-left">Action</th>
                     </tr>
                 </thead>
@@ -72,17 +82,59 @@
             </table>
 
             <!-- Overall Cost & Revenue -->
-            <div class="mt-6 text-right space-y-2">
-                <h3 class="text-xl font-bold text-gray-800">
+            <div class="mt-6 text-right space-y-1" style="text-align: right; margin-top: 1.5rem;">
+                <h3 class="text-lg font-bold text-gray-800" style="margin: 0;">
                     Overall Cost: <span id="overallCost">₱0.00</span>
                 </h3>
-                <h3 class="text-xl font-bold text-gray-800">
+                <h3 class="text-lg font-bold text-gray-800" style="margin: 0;">
                     Overall Revenue: <span id="overallRevenue">₱0.00</span>
                 </h3>
             </div>
         @else
             <p class="text-gray-500">No raw materials available for this product.</p>
         @endif
+    </div>
+
+    <!-- Invisible Divider / Spacer -->
+    <div class="h-20"></div>
+
+    <!-- Quotation Section -->
+    <div class="w-full max-w-7xl p-6 rounded-2xl shadow-md bg-white">
+        <h2 class="text-2xl font-bold mb-4">Quotation</h2>
+
+        <table class="w-full table-auto border-collapse border border-gray-200">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="border px-4 py-2 text-left">Product</th>
+                    <th class="border px-4 py-2 text-left">Quantity</th>
+                    <th class="border px-4 py-2 text-left">Cost per Piece</th>
+                    <th class="border px-4 py-2 text-left">Markup per Piece (₱)</th>
+                    <th class="border px-4 py-2 text-left">Selling Price per Piece</th>
+                    <th class="border px-4 py-2 text-left">Discount (%)</th>
+                    <th class="border px-4 py-2 text-left">Total Selling Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="quotationRow">
+                    <td class="border px-4 py-2 font-medium">{{ $product->name }}</td>
+                    <td class="border px-4 py-2">
+                        <input type="number" id="quoteQty" min="1" value="0"
+                            class="w-24 px-2 py-1 border rounded">
+                    </td>
+                    <td class="border px-4 py-2" id="quoteCostPerPiece">₱0.00</td>
+                    <td class="border px-4 py-2">
+                        <input type="number" id="quoteMarkup" step="0.01" value="0"
+                            class="w-24 px-2 py-1 border rounded">
+                    </td>
+                    <td class="border px-4 py-2" id="quoteSellingPrice">₱0.00</td>
+                    <td class="border px-4 py-2">
+                        <input type="number" id="quoteDiscount" step="0.01" value="0"
+                            class="w-24 px-2 py-1 border rounded">
+                    </td>
+                    <td class="border px-4 py-2" id="quoteTotal">₱0.00</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -96,28 +148,25 @@ const overallRevenueEl = document.getElementById('overallRevenue');
 
 function updateTotals() {
     let overallTotal = 0;
-    let overallRevenue = 0;
     const rows = costingBody.querySelectorAll('tr');
 
     rows.forEach(row => {
         const qtyInput = row.querySelector('.quantity-input');
         const priceInput = row.querySelector('.unit-price-input');
-        const profitInput = row.querySelector('.profit-input');
         const totalEl = row.querySelector('.total-price');
 
         const qty = parseFloat(qtyInput.value) || 0;
         const price = parseFloat(priceInput.value) || 0;
-        const profit = parseFloat(profitInput.value) || 0;
         const total = qty * price;
 
         totalEl.innerText = '₱' + total.toFixed(2);
-
         overallTotal += total;
-        overallRevenue += total + profit;
     });
 
     overallCostEl.innerText = '₱' + overallTotal.toFixed(2);
-    overallRevenueEl.innerText = '₱' + overallRevenue.toFixed(2);
+    overallRevenueEl.innerText = '₱' + overallTotal.toFixed(2); // same as cost, markup nasa quotation
+
+    updateQuotation(); // auto update quotation
 }
 
 // Add raw material row
@@ -129,7 +178,6 @@ addRawBtn.addEventListener('click', () => {
     const rawName = selectedOption.dataset.name;
     const unitPrice = selectedOption.dataset.price || 0;
 
-    // Check if already added
     if([...costingBody.querySelectorAll('tr')].some(r => r.dataset.id == rawId)) {
         alert('Raw material already added!');
         return;
@@ -144,27 +192,23 @@ addRawBtn.addEventListener('click', () => {
             <input type="number" min="0" value="0" class="w-20 px-2 py-1 border rounded quantity-input">
         </td>
         <td class="border px-4 py-2">
-            <input type="number" step="0.01" value="${unitPrice}" class="w-24 px-2 py-1 border rounded unit-price-input">
+            <input type="number" step="0.01" value="${unitPrice}" class="w-24 px-2 py-1 border rounded unit-price-input" readonly>
         </td>
         <td class="border px-4 py-2 total-price">₱0.00</td>
         <td class="border px-4 py-2">
-            <input type="number" step="0.01" value="0" class="w-24 px-2 py-1 border rounded profit-input">
-        </td>
-        <td class="border px-4 py-2">
-            <button type="button" class="remove-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Remove</button>
+            <button type="button" 
+                class="remove-btn text-white px-2 py-1 rounded hover:bg-red-600 transition"
+                style="background-color: rgb(239 68 68);">
+                Remove
+            </button>
         </td>
     `;
     costingBody.appendChild(row);
 
-    // Attach event listeners
     const qtyInput = row.querySelector('.quantity-input');
-    const priceInput = row.querySelector('.unit-price-input');
-    const profitInput = row.querySelector('.profit-input');
     const removeBtn = row.querySelector('.remove-btn');
 
     qtyInput.addEventListener('input', updateTotals);
-    priceInput.addEventListener('input', updateTotals);
-    profitInput.addEventListener('input', updateTotals);
     removeBtn.addEventListener('click', () => {
         row.remove();
         updateTotals();
@@ -173,18 +217,62 @@ addRawBtn.addEventListener('click', () => {
     updateTotals();
 });
 
-// Prepare PDF data before submitting form
+// Prepare PDF data
 function preparePdfData() {
     const rows = costingBody.querySelectorAll('tr');
     const data = Array.from(rows).map(row => ({
         name: row.children[0].innerText,
         quantity: row.querySelector('.quantity-input').value,
         unit_price: row.querySelector('.unit-price-input').value,
-        total_price: row.querySelector('.total-price').innerText,
-        profit: row.querySelector('.profit-input').value
+        total_price: row.querySelector('.total-price').innerText
     }));
     document.getElementById('costingDataInput').value = JSON.stringify(data);
 }
+
+/* ========================
+   Quotation Section Script
+   ======================== */
+const quoteQty = document.getElementById('quoteQty');
+const quoteMarkup = document.getElementById('quoteMarkup');
+const quoteDiscount = document.getElementById('quoteDiscount');
+const quoteCostPerPiece = document.getElementById('quoteCostPerPiece');
+const quoteSellingPrice = document.getElementById('quoteSellingPrice');
+const quoteTotal = document.getElementById('quoteTotal');
+
+function updateQuotation() {
+    const qty = parseFloat(quoteQty.value) || 0;
+    const markup = parseFloat(quoteMarkup.value) || 0;
+    const discount = parseFloat(quoteDiscount.value) || 0;
+
+    const overallCost = [...costingBody.querySelectorAll('tr')].reduce((sum, row) => {
+        const qtyInput = row.querySelector('.quantity-input');
+        const priceInput = row.querySelector('.unit-price-input');
+        const qtyVal = parseFloat(qtyInput.value) || 0;
+        const priceVal = parseFloat(priceInput.value) || 0;
+        return sum + (qtyVal * priceVal);
+    }, 0);
+
+    if(qty > 0) {
+        const costPerPiece = overallCost / qty;
+        const sellingPricePerPiece = costPerPiece + markup;
+        const totalSellingPrice = sellingPricePerPiece * qty;
+        const finalTotal = totalSellingPrice - (totalSellingPrice * (discount / 100));
+
+        quoteCostPerPiece.innerText = '₱' + costPerPiece.toFixed(2);
+        quoteSellingPrice.innerText = '₱' + sellingPricePerPiece.toFixed(2);
+        quoteTotal.innerText = '₱' + finalTotal.toFixed(2);
+    } else {
+        quoteCostPerPiece.innerText = '₱0.00';
+        quoteSellingPrice.innerText = '₱0.00';
+        quoteTotal.innerText = '₱0.00';
+    }
+}
+
+// Events
+quoteQty.addEventListener('input', updateQuotation);
+quoteMarkup.addEventListener('input', updateQuotation);
+quoteDiscount.addEventListener('input', updateQuotation);
+
 </script>
 
 @endsection

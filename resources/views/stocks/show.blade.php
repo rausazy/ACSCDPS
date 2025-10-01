@@ -82,18 +82,20 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex justify-end space-x-2 mt-4">
-                            <button onclick="openEditModal({{ $raw->id }}, '{{ $raw->name }}', {{ $raw->quantity }}, {{ $raw->price }})"
-                                class="px-3 py-1 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-600 transition">
-                                Edit
-                            </button>
+<div class="flex justify-end mt-4">
+    <button onclick="openEditModal({{ $raw->id }}, '{{ $raw->name }}', {{ $raw->quantity }}, {{ $raw->price }})"
+        class="px-3 py-1 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-600 transition mr-2"
+        style="background-color: rgb(59 130 246);"> <!-- bg-blue-500 -->
+        Edit
+    </button>
 
-                            <button type="button" 
-                                onclick="openDeleteModal({{ $raw->id }}, '{{ $raw->name }}')"
-                                class="px-3 py-1 rounded-md bg-red-500 text-white text-sm hover:bg-red-600 transition">
-                                Delete
-                            </button>
-                        </div>
+    <button type="button" 
+        onclick="openDeleteModal({{ $raw->id }}, '{{ $raw->name }}')"
+        class="px-3 py-1 rounded-md bg-red-500 text-white text-sm hover:bg-red-600 transition"
+        style="background-color: rgb(239 68 68);"> <!-- bg-red-500 -->
+        Delete
+    </button>
+</div>
                     </div>
                 @endforeach
             </div>
@@ -179,9 +181,11 @@
                     <button type="button" onclick="document.getElementById('editRawModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto">
                         Cancel
                     </button>
-                    <button type="submit" class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition w-full sm:w-auto">
-                        Update
-                    </button>
+                <button type="submit" 
+                    class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition w-full sm:w-auto"
+                    style="background-color: rgb(59 130 246);"> <!-- bg-blue-500 -->
+                    Update
+                </button>
                 </div>
             </form>
         </div>
@@ -200,7 +204,9 @@
                     <button type="button" onclick="document.getElementById('deleteRawModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto">
                         Cancel
                     </button>
-                    <button type="submit" class="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition w-full sm:w-auto">
+                    <button type="submit" 
+                        class="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition w-full sm:w-auto"
+                        style="background-color: rgb(239 68 68); margin-left: 0.5rem;"> <!-- bg-red-500 -->
                         Delete
                     </button>
                 </div>
