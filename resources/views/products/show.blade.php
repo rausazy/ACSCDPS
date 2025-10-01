@@ -138,13 +138,21 @@
     </div>
 </div>
 
-<!-- Script -->
 <script>
 const costingBody = document.getElementById('costingBody');
 const rawSelect = document.getElementById('rawSelect');
 const addRawBtn = document.getElementById('addRawBtn');
 const overallCostEl = document.getElementById('overallCost');
 const overallRevenueEl = document.getElementById('overallRevenue');
+
+const quoteQty = document.getElementById('quoteQty');
+const quoteMarkup = document.getElementById('quoteMarkup');
+const quoteDiscount = document.getElementById('quoteDiscount');
+const quoteCostPerPiece = document.getElementById('quoteCostPerPiece');
+const quoteSellingPrice = document.getElementById('quoteSellingPrice');
+const quoteTotal = document.getElementById('quoteTotal');
+
+let currentQuoteTotal = 0; // store quotation total para magamit sa revenue
 
 function updateTotals() {
     let overallTotal = 0;
@@ -164,9 +172,47 @@ function updateTotals() {
     });
 
     overallCostEl.innerText = '₱' + overallTotal.toFixed(2);
-    overallRevenueEl.innerText = '₱' + overallTotal.toFixed(2); // same as cost, markup nasa quotation
 
-    updateQuotation(); // auto update quotation
+    // compute overall revenue (overall cost + quotation total)
+    overallRevenueEl.innerText = '₱' + (overallTotal + currentQuoteTotal).toFixed(2);
+}
+
+/* ========================
+   Quotation Section Script
+   ======================== */
+function updateQuotation() {
+    const qty = parseFloat(quoteQty.value) || 0;
+    const markup = parseFloat(quoteMarkup.value) || 0;
+    const discount = parseFloat(quoteDiscount.value) || 0;
+
+    const overallCost = [...costingBody.querySelectorAll('tr')].reduce((sum, row) => {
+        const qtyInput = row.querySelector('.quantity-input');
+        const priceInput = row.querySelector('.unit-price-input');
+        const qtyVal = parseFloat(qtyInput.value) || 0;
+        const priceVal = parseFloat(priceInput.value) || 0;
+        return sum + (qtyVal * priceVal);
+    }, 0);
+
+    if(qty > 0) {
+        const costPerPiece = overallCost / qty;
+        const sellingPricePerPiece = costPerPiece + markup;
+        const totalSellingPrice = sellingPricePerPiece * qty;
+        const finalTotal = totalSellingPrice - (totalSellingPrice * (discount / 100));
+
+        quoteCostPerPiece.innerText = '₱' + costPerPiece.toFixed(2);
+        quoteSellingPrice.innerText = '₱' + sellingPricePerPiece.toFixed(2);
+        quoteTotal.innerText = '₱' + finalTotal.toFixed(2);
+
+        currentQuoteTotal = finalTotal; // update global var
+    } else {
+        quoteCostPerPiece.innerText = '₱0.00';
+        quoteSellingPrice.innerText = '₱0.00';
+        quoteTotal.innerText = '₱0.00';
+        currentQuoteTotal = 0;
+    }
+
+    // refresh totals after updating quotation
+    updateTotals();
 }
 
 // Add raw material row
@@ -208,71 +254,25 @@ addRawBtn.addEventListener('click', () => {
     const qtyInput = row.querySelector('.quantity-input');
     const removeBtn = row.querySelector('.remove-btn');
 
-    qtyInput.addEventListener('input', updateTotals);
+    qtyInput.addEventListener('input', () => {
+        updateTotals();
+        updateQuotation();
+    });
     removeBtn.addEventListener('click', () => {
         row.remove();
         updateTotals();
+        updateQuotation();
     });
 
     updateTotals();
 });
 
-// Prepare PDF data
-function preparePdfData() {
-    const rows = costingBody.querySelectorAll('tr');
-    const data = Array.from(rows).map(row => ({
-        name: row.children[0].innerText,
-        quantity: row.querySelector('.quantity-input').value,
-        unit_price: row.querySelector('.unit-price-input').value,
-        total_price: row.querySelector('.total-price').innerText
-    }));
-    document.getElementById('costingDataInput').value = JSON.stringify(data);
-}
-
-/* ========================
-   Quotation Section Script
-   ======================== */
-const quoteQty = document.getElementById('quoteQty');
-const quoteMarkup = document.getElementById('quoteMarkup');
-const quoteDiscount = document.getElementById('quoteDiscount');
-const quoteCostPerPiece = document.getElementById('quoteCostPerPiece');
-const quoteSellingPrice = document.getElementById('quoteSellingPrice');
-const quoteTotal = document.getElementById('quoteTotal');
-
-function updateQuotation() {
-    const qty = parseFloat(quoteQty.value) || 0;
-    const markup = parseFloat(quoteMarkup.value) || 0;
-    const discount = parseFloat(quoteDiscount.value) || 0;
-
-    const overallCost = [...costingBody.querySelectorAll('tr')].reduce((sum, row) => {
-        const qtyInput = row.querySelector('.quantity-input');
-        const priceInput = row.querySelector('.unit-price-input');
-        const qtyVal = parseFloat(qtyInput.value) || 0;
-        const priceVal = parseFloat(priceInput.value) || 0;
-        return sum + (qtyVal * priceVal);
-    }, 0);
-
-    if(qty > 0) {
-        const costPerPiece = overallCost / qty;
-        const sellingPricePerPiece = costPerPiece + markup;
-        const totalSellingPrice = sellingPricePerPiece * qty;
-        const finalTotal = totalSellingPrice - (totalSellingPrice * (discount / 100));
-
-        quoteCostPerPiece.innerText = '₱' + costPerPiece.toFixed(2);
-        quoteSellingPrice.innerText = '₱' + sellingPricePerPiece.toFixed(2);
-        quoteTotal.innerText = '₱' + finalTotal.toFixed(2);
-    } else {
-        quoteCostPerPiece.innerText = '₱0.00';
-        quoteSellingPrice.innerText = '₱0.00';
-        quoteTotal.innerText = '₱0.00';
-    }
-}
-
-// Events
+// Events for quotation inputs
 quoteQty.addEventListener('input', updateQuotation);
 quoteMarkup.addEventListener('input', updateQuotation);
 quoteDiscount.addEventListener('input', updateQuotation);
 
 </script>
+
 
 @endsection
