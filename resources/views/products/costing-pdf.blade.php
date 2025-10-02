@@ -1,154 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{{ $product->name }} Costing</title>
+    <meta charset="UTF-8">
+    <title>Quotation - {{ $product->name }}</title>
     <style>
-        body { 
-            font-family: DejaVu Sans, sans-serif; 
-            font-size: 14px; 
-            color: #333;
-            margin: 0;
-            padding: 0;
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 14px;
         }
-
-        header {
-            text-align: center;
-            margin-bottom: 10px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-
-        header img {
-            height: 60px;
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
         }
-
-        header h2 {
-            margin: 5px 0;
-            color: #4B0082;
-        }
-
-        header .contact {
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-
-        /* Customer info box */
-        .customer-info {
-            margin-bottom: 10px;
-            font-size: 13px;
-        }
-
-        table { 
-            width: 80%; 
-            margin: 0 auto 20px auto; /* center table */
-            border-collapse: collapse; 
-        }
-
-        th, td { 
-            border: 1px solid #ccc; 
-            padding: 6px; 
-            text-align: left; 
-        }
-
-        th { 
-            background-color: #f5f5f5; 
-            color: #4B0082; 
-            font-weight: bold;
-        }
-
-        tr:nth-child(even) { 
-            background-color: #f9f9f9; 
-        }
-
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 400px;
-            height: 400px;
-            opacity: 0.1;
-            transform: translate(-50%, -50%);
-        }
-
-        .totals {
-            width: 80%;
-            margin: 0 auto 20px auto;
-            text-align: right;
-            font-weight: bold;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        footer p {
-            margin: 2px;
+        th {
+            background: #f3f3f3;
         }
     </style>
 </head>
 <body>
-
-    <header>
-        <img src="{{ public_path('images/CinleiLogo.png') }}" alt="Logo">
-        <h2>Cinlei Digital Printing Services</h2>
-        <div class="contact">
-            Email: cinlei@example.com | Phone: 0912-345-6789 | Facebook: /cinleidigital
-        </div>
-    </header>
-
-    <div class="customer-info">
-        <strong>Customer Name:</strong> {{ $customerName ?? 'N/A' }}<br>
-        <strong>Order Date:</strong> {{ $orderDate ?? date('Y-m-d') }}
-    </div>
-
-    <!-- Watermark -->
-    <img class="watermark" src="{{ public_path('images/CinleiLogo.png') }}" alt="Logo">
-
-    <h3 style="text-align:center;">{{ $product->name }} Costing</h3>
+    <h2>Quotation</h2>
 
     <table>
         <thead>
             <tr>
-                <th>Raw Material</th>
+                <th>Product</th>
                 <th>Quantity</th>
-                <th>Unit Price</th>
+                <th>Selling Price / Piece</th>
+                <th>Discount (%)</th>
                 <th>Total Price</th>
-                <th>Desired Profit</th>
             </tr>
         </thead>
         <tbody>
-            @php
-                $overallCost = 0;
-                $overallRevenue = 0;
-            @endphp
-            @foreach($costingData as $raw)
-                @php
-                    $qty = $raw['quantity'] ?? 0;
-                    $unit = $raw['unit_price'] ?? 0;
-                    $profit = $raw['profit'] ?? 0;
-                    $total = $qty * $unit;
-                    $overallCost += $total;
-                    $overallRevenue += $total + $profit;
-                @endphp
-                <tr>
-                    <td>{{ $raw['name'] }}</td>
-                    <td>{{ $qty }}</td>
-                    <td>₱{{ number_format($unit,2) }}</td>
-                    <td>₱{{ number_format($total,2) }}</td>
-                    <td>₱{{ number_format($profit,2) }}</td>
-                </tr>
-            @endforeach
+            <tr>
+                <td>{{ $costingData['product'] }}</td>
+                <td>{{ $costingData['quantity'] }}</td>
+                <td>₱{{ number_format($costingData['selling_price_per_piece'], 2) }}</td>
+                <td>{{ $costingData['discount'] }}%</td>
+                <td>₱{{ number_format($costingData['total_price'], 2) }}</td>
+            </tr>
         </tbody>
     </table>
-
-    <div class="totals">
-        <p>Overall Cost: ₱{{ number_format($overallCost,2) }}</p>
-        <p>Overall Revenue: ₱{{ number_format($overallRevenue,2) }}</p>
-    </div>
-
-    <footer>
-        <p>Rubelyn N. Palacol</p>
-        <p>PROPRIETOR</p>
-    </footer>
-
 </body>
 </html>

@@ -31,18 +31,6 @@
 
         <h2 class="text-2xl font-bold mb-4 flex justify-between items-center">
             Costing
-
-            <!-- Export PDF Button Form -->
-            <form id="pdfForm" method="POST" action="{{ route('products.costing.pdf', $product->url) }}" target="_blank">
-                @csrf
-                <input type="hidden" name="costing_data" id="costingDataInput">
-                <button type="submit" onclick="preparePdfData()" 
-                    class="px-4 py-2 bg-purple-600 text-white font-medium rounded-md 
-                        hover:bg-purple-700 transition-colors duration-200"
-                    style="background-color: rgb(147 51 234);"> <!-- bg-purple-600 -->
-                    Export as PDF
-                </button>
-            </form>
         </h2>
 
         @if($rawMaterials->count())
@@ -98,45 +86,62 @@
     <!-- Invisible Divider / Spacer -->
     <div class="h-20"></div>
 
-    <!-- Quotation Section -->
-    <div class="w-full max-w-7xl p-6 rounded-2xl shadow-md bg-white">
-        <h2 class="text-2xl font-bold mb-4">Quotation</h2>
+   <!-- Quotation Section -->
+<div class="w-full max-w-7xl p-6 rounded-2xl shadow-md bg-white">
+    <h2 class="text-2xl font-bold mb-4 flex justify-between items-center">
+        Quotation
 
-        <table class="w-full table-auto border-collapse border border-gray-200">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="border px-4 py-2 text-left">Product</th>
-                    <th class="border px-4 py-2 text-left">Quantity</th>
-                    <th class="border px-4 py-2 text-left">Cost per Piece</th>
-                    <th class="border px-4 py-2 text-left">Markup per Piece (₱)</th>
-                    <th class="border px-4 py-2 text-left">Selling Price per Piece</th>
-                    <th class="border px-4 py-2 text-left">Discount (%)</th>
-                    <th class="border px-4 py-2 text-left">Total Selling Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr id="quotationRow">
-                    <td class="border px-4 py-2 font-medium">{{ $product->name }}</td>
-                    <td class="border px-4 py-2">
-                        <input type="number" id="quoteQty" min="1" value="0"
-                            class="w-24 px-2 py-1 border rounded">
-                    </td>
-                    <td class="border px-4 py-2" id="quoteCostPerPiece">₱0.00</td>
-                    <td class="border px-4 py-2">
-                        <input type="number" id="quoteMarkup" step="0.01" value="0"
-                            class="w-24 px-2 py-1 border rounded">
-                    </td>
-                    <td class="border px-4 py-2" id="quoteSellingPrice">₱0.00</td>
-                    <td class="border px-4 py-2">
-                        <input type="number" id="quoteDiscount" step="0.01" value="0"
-                            class="w-24 px-2 py-1 border rounded">
-                    </td>
-                    <td class="border px-4 py-2" id="quoteTotal">₱0.00</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+        <!-- Export PDF Button Form -->
+        <form id="pdfForm" method="POST" 
+              action="{{ route('products.costing.pdf', $product->url) }}" 
+              target="_blank" 
+              onsubmit="preparePdfData(event)">
+            @csrf
+            <input type="hidden" name="costing_data" id="costingDataInput">
+            <button type="submit" 
+                class="px-4 py-2 bg-purple-600 text-white font-medium rounded-md 
+                       hover:bg-purple-700 transition-colors duration-200"
+                style="background-color: rgb(147 51 234);">
+                Export as PDF
+            </button>
+        </form>
+    </h2>
+
+    <table class="w-full table-auto border-collapse border border-gray-200">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="border px-4 py-2 text-left">Product</th>
+                <th class="border px-4 py-2 text-left">Quantity</th>
+                <th class="border px-4 py-2 text-left">Cost per Piece</th>
+                <th class="border px-4 py-2 text-left">Markup per Piece (₱)</th>
+                <th class="border px-4 py-2 text-left">Selling Price per Piece</th>
+                <th class="border px-4 py-2 text-left">Discount (%)</th>
+                <th class="border px-4 py-2 text-left">Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="quotationRow">
+                <td class="border px-4 py-2 font-medium">{{ $product->name }}</td>
+                <td class="border px-4 py-2">
+                    <input type="number" id="quoteQty" min="1" value="0"
+                        class="w-24 px-2 py-1 border rounded">
+                </td>
+                <td class="border px-4 py-2" id="quoteCostPerPiece">₱0.00</td>
+                <td class="border px-4 py-2">
+                    <input type="number" id="quoteMarkup" step="0.01" value="0"
+                        class="w-24 px-2 py-1 border rounded">
+                </td>
+                <td class="border px-4 py-2" id="quoteSellingPrice">₱0.00</td>
+                <td class="border px-4 py-2">
+                    <input type="number" id="quoteDiscount" step="0.01" value="0"
+                        class="w-24 px-2 py-1 border rounded">
+                </td>
+                <td class="border px-4 py-2" id="quoteTotal">₱0.00</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
+
 
 <script>
 const costingBody = document.getElementById('costingBody');
@@ -272,7 +277,30 @@ quoteQty.addEventListener('input', updateQuotation);
 quoteMarkup.addEventListener('input', updateQuotation);
 quoteDiscount.addEventListener('input', updateQuotation);
 
-</script>
 
+/* ========================
+   PDF Export Data Preparer
+   ======================== */
+function preparePdfData(event) {
+    // prevent form submitting immediately
+    if (event) event.preventDefault();
+
+    // make sure values are up to date
+    updateQuotation();
+
+    const data = {
+        product: "{{ $product->name }}",
+        quantity: document.getElementById('quoteQty').value || 0,
+        selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
+        discount: parseFloat(document.getElementById('quoteDiscount').value) || 0,
+        total_price: parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0
+    };
+
+    document.getElementById('costingDataInput').value = JSON.stringify(data);
+
+    // submit form manually after setting hidden field
+    document.getElementById('pdfForm').submit();
+}
+</script>
 
 @endsection

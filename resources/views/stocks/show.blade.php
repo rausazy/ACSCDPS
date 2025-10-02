@@ -82,20 +82,20 @@
                         </div>
 
                         <!-- Action Buttons -->
-<div class="flex justify-end mt-4">
-    <button onclick="openEditModal({{ $raw->id }}, '{{ $raw->name }}', {{ $raw->quantity }}, {{ $raw->price }})"
-        class="px-3 py-1 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-600 transition mr-2"
-        style="background-color: rgb(59 130 246);"> <!-- bg-blue-500 -->
-        Edit
-    </button>
+                        <div class="flex justify-end mt-4">
+                            <button onclick="openEditModal({{ $raw->id }}, '{{ $raw->name }}', {{ $raw->quantity }}, {{ $raw->price }})"
+                                class="px-3 py-1 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-600 transition mr-2"
+                                style="background-color: rgb(59 130 246);"> <!-- bg-blue-500 -->
+                                Edit
+                            </button>
 
-    <button type="button" 
-        onclick="openDeleteModal({{ $raw->id }}, '{{ $raw->name }}')"
-        class="px-3 py-1 rounded-md bg-red-500 text-white text-sm hover:bg-red-600 transition"
-        style="background-color: rgb(239 68 68);"> <!-- bg-red-500 -->
-        Delete
-    </button>
-</div>
+                            <button type="button" 
+                                onclick="openDeleteModal({{ $raw->id }}, '{{ $raw->name }}')"
+                                class="px-3 py-1 rounded-md bg-red-500 text-white text-sm hover:bg-red-600 transition"
+                                style="background-color: rgb(239 68 68);"> <!-- bg-red-500 -->
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -104,46 +104,60 @@
         @endif
     </div>
 
-    <!-- Add Raw Material Modal -->
+    <!-- ✅ Add Raw Material Modal -->
     <div id="addRawModal" class="hidden fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-50">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-xs sm:max-w-md p-4 sm:p-6">
             <h2 class="text-2xl font-bold mb-4">Add Raw Material</h2>
 
-            @if ($errors->any())
-                <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
-                    <ul class="list-disc list-inside text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('raw-materials.store', $stock->id) }}">
                 @csrf
+
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-1">Name</label>
-                    <input type="text" name="name" value="{{ old('name') }}" required
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
+                    <input type="text" name="name" required
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-1">Quantity</label>
-                    <input type="number" name="quantity" value="{{ old('quantity') }}" min="0"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
+                <!-- ✅ Checkbox to toggle sizes -->
+                <div style="margin-top: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="has_sizes" name="has_sizes" style="height:16px; width:16px; accent-color:#9333ea; cursor:pointer;">
+                    <label for="has_sizes" style="color:#374151; font-weight:500; cursor:pointer;">Has Sizes?</label>
+                </div>
+                <!-- Normal Fields (hidden if sizes enabled) -->
+                <div id="normalFields">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-1">Quantity</label>
+                        <input type="number" name="quantity" min="0"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-1">Price</label>
+                        <input type="number" step="0.01" name="price" min="0"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-gray-700 font-medium mb-1">Price</label>
-                    <input type="number" step="0.01" name="price" value="{{ old('price') }}" min="0"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
+                <!-- Sizes Section -->
+                <div id="sizesSection" class="hidden">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-gray-700 font-medium">Sizes</label>
+                        <button type="button" onclick="addSizeRow()" 
+                            class="text-sm px-2 py-1 bg-purple-600 text-white rounded-md">
+                            + Add Size
+                        </button>
+                    </div>
+                   <div id="sizesContainer" class="space-y-2" 
+                        style="margin-top:12px; margin-bottom:12px; display:flex; flex-direction:column; gap:8px;">
+                    </div>
                 </div>
 
                 <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-6">
-                    <button type="button" onclick="document.getElementById('addRawModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto">
+                    <button type="button" onclick="document.getElementById('addRawModal').classList.add('hidden')" 
+                        class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto">
                         Cancel
                     </button>
-                    <button type="submit" class="px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition w-full sm:w-auto">
+                    <button type="submit" 
+                        class="px-4 py-2 rounded-md bg-purple-600 text-white hover:bg-purple-700 transition w-full sm:w-auto">
                         Add Raw Material
                     </button>
                 </div>
@@ -181,11 +195,11 @@
                     <button type="button" onclick="document.getElementById('editRawModal').classList.add('hidden')" class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto">
                         Cancel
                     </button>
-                <button type="submit" 
-                    class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition w-full sm:w-auto"
-                    style="background-color: rgb(59 130 246);"> <!-- bg-blue-500 -->
-                    Update
-                </button>
+                    <button type="submit" 
+                        class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition w-full sm:w-auto"
+                        style="background-color: rgb(59 130 246);"> <!-- bg-blue-500 -->
+                        Update
+                    </button>
                 </div>
             </form>
         </div>
@@ -239,9 +253,19 @@
         const div = document.createElement('div');
         div.classList.add('flex', 'space-x-2');
         div.innerHTML = `
-            <input type="text" name="sizes[${sizeIndex}][name]" placeholder="Size" class="w-1/3 border rounded-md px-2 py-1" required>
-            <input type="number" name="sizes[${sizeIndex}][quantity]" placeholder="Quantity" class="w-1/3 border rounded-md px-2 py-1" min="0" required>
-            <input type="number" step="0.01" name="sizes[${sizeIndex}][price]" placeholder="Price" class="w-1/3 border rounded-md px-2 py-1" min="0" required>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+    <input type="text" name="sizes[${sizeIndex}][name]" placeholder="Size" 
+        style="flex:1; min-width:80px; max-width:120px; padding:6px 10px; 
+               border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
+
+    <input type="number" name="sizes[${sizeIndex}][quantity]" placeholder="Quantity" min="0"
+        style="flex:1; min-width:100px; max-width:120px; padding:6px 10px; 
+               border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
+
+    <input type="number" step="0.01" name="sizes[${sizeIndex}][price]" placeholder="Price" min="0"
+        style="flex:1; min-width:100px; max-width:140px; padding:6px 10px; 
+               border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
+</div>
         `;
         sizesContainer.appendChild(div);
         sizeIndex++;
