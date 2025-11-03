@@ -48,7 +48,7 @@ public function store(Request $request)
     ]);
 
     // ✅ Create corresponding Stock entry with default quantity 0 via polymorphic relation
-    $product->stock()->create([
+    $product->stocks()->create([
         'quantity' => 0,
     ]);
 
@@ -69,7 +69,7 @@ public function store(Request $request)
         return redirect()->route('products.products')->with('success', 'Product successfully deleted!');
     }
 
-   public function show($url)   
+   public function show($url)
 {
     $product = Product::where('url', $url)->firstOrFail();
 
@@ -89,16 +89,11 @@ public function exportPdf(Request $request, $url)
 
     $costingData = json_decode($request->costing_data, true);
 
-    // Load PDF view
     $pdf = \PDF::loadView('products.costing-pdf', [
         'product' => $product,
         'costingData' => $costingData,
     ]);
 
-    // Pwede mong gamitin stream para i-display agad sa browser
-    return $pdf->stream($product->name . '_quotation.pdf');
-
-    // O download kung gusto mo automatic save
-    // return $pdf->download($product->name . '_quotation.pdf');
+    return $pdf->stream($product->name . '_costing.pdf');
 }
 }

@@ -54,6 +54,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/costing/{product}', [CostingController::class, 'show'])->name('costing.show');
     Route::post('/costing/{product}', [CostingController::class, 'store'])->name('costing.store');
 
-    Route::post('/products/{product}/costing/pdf', [CostingController::class, 'exportPdf'])
-    ->name('products.costing-pdf');
+    Route::post('/products/{url}/costing/pdf', [ProductsController::class, 'exportPdf'])->name('products.costing.pdf');
 });
