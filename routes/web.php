@@ -56,4 +56,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/products/{product}/costing/pdf', [ProductsController::class, 'exportPdf'])
     ->name('products.costing-pdf');
+
+    Route::post('/services/{service}/costing/pdf', [ServiceController::class, 'exportPdf'])
+    ->name('services.costing-pdf');
 });

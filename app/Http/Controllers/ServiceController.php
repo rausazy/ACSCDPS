@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Service;
 use Illuminate\Support\Str;
+use PDF;
 
 class ServiceController extends Controller
 {
@@ -64,7 +65,28 @@ class ServiceController extends Controller
 
     public function show($url)
     {
-        $service = Service::where('url', $url)->firstOrFail(); // fetch by slug
-        return view('services.show', compact('service'));
+        $service = Service::where('url', $url)->firstOrFail();
+
+        // Kunin raw materials ng stock ng service (same logic as products)
+        $rawMaterials = $service->stock 
+            ? $service->stock->rawMaterials()->orderBy('name')->get() 
+            : collect();
+
+        return view('services.show', compact('service', 'rawMaterials'));
+    }
+
+        public function exportPdf(Request $request, $url)
+    {
+        $service = Service::where('url', $url)->firstOrFail();
+
+        $costingData = json_decode($request->costing_data, true);
+
+        // Load PDF view
+        $pdf = \PDF::loadView('services.costing-pdf', [
+            'service' => $service,
+            'costingData' => $costingData,
+        ]);
+        
+        return $pdf->stream($service->name . '_quotation.pdf');
     }
 }
