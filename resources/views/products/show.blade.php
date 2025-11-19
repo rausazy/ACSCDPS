@@ -1,7 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="min-h-screen flex flex-col items-center py-16 px-4 sm:px-6 lg:px-8">
+
+    <div style="width:100%;max-width:80rem;margin-bottom:1.5rem;margin-top:-2rem;">
+        <a href="{{ url('/products') }}" 
+           style="display:inline-flex;align-items:center;color:#9333ea;font-weight:500;text-decoration:none;transition:color .2s ease;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="height:20px;width:20px;margin-right:0.5rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Products
+        </a>
+    </div>
+
+    <div style="text-align:center;margin-bottom:3.5rem;width:100%;display:flex;justify-content:center;align-items:center;gap:1rem;">
+        <x-dynamic-component :component="'heroicon-o-' . $product->icon" style="width:3rem;height:3rem;" /> 
+        <h1 style="font-size:3rem;font-weight:800;background:linear-gradient(to right,#9333ea,#ec4899,#3b82f6);-webkit-background-clip:text;color:transparent;line-height:1.2;padding-bottom:0.5rem;">
+            {{ $product->name }}
+        </h1>
+    </div>
 
     <div style="width:100%;max-width:80rem;margin-bottom:2rem;padding:1.5rem;border-radius:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.1);background:#fff;">
         <h2 style="font-weight:700;font-size:1.5rem;margin-bottom:1rem;">Customer Details</h2>
@@ -31,7 +49,6 @@
             </div>
         </div>
     </div>
-
     <div style="width:100%;max-width:80rem;padding:1.5rem;border-radius:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.1);background:#fff;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 auto;">
 
         <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
@@ -323,7 +340,6 @@ function confirmOrder() {
 
     const rawMaterials = getRawMaterialData();
     
-    // This is the data object you will send to your server/backend
     const orderData = {
         customer: {
             name: document.getElementById('customerName').value,
@@ -346,10 +362,8 @@ function confirmOrder() {
         }
     };
 
-    // For demonstration, we log the data
     console.log("Order Data Sent to Server:", orderData);
     
-    // Show the confirmation modal
     confirmationModal.style.display = 'block';
 }
 
@@ -375,7 +389,6 @@ function preparePdfData(event) {
     document.getElementById('pdfForm').submit();
 }
 
-// Close modal when clicking outside 
 window.onclick = function(event) {
     if (event.target == confirmationModal) {
         closeModal();
