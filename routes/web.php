@@ -8,6 +8,7 @@ use App\Http\Controllers\StocksController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CostingController;
+use App\Http\Controllers\HistoryController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
@@ -45,6 +46,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
     Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
     Route::get('/services/{url}', [ServiceController::class, 'show'])->name('services.show');
+
+    // History
+    Route::get('/history', [HistoryController::class, 'index'])->name('history.history');
+
 
     // Logout
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
