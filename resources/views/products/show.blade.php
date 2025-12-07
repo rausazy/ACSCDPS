@@ -362,9 +362,21 @@ function confirmOrder() {
         }
     };
 
-    console.log("Order Data Sent to Server:", orderData);
-    
-    confirmationModal.style.display = 'block';
+    fetch("{{ route('history.store') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify(orderData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        confirmationModal.style.display = 'block';
+    })
+    .catch(err => {
+        console.error("Error saving order:", err);
+    });
 }
 
 function preparePdfData(event) {

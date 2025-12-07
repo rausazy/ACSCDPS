@@ -49,6 +49,12 @@ Route::middleware('auth')->group(function () {
 
     // History
     Route::get('/history', [HistoryController::class, 'index'])->name('history.history');
+    Route::post('/history', [HistoryController::class, 'store'])->name('history.store');
+    Route::get('/history', [HistoryController::class, 'history'])->name('history');
+    Route::post('/history/export-pdf', [HistoryController::class, 'exportPdf'])->name('history.export-pdf');
+    Route::delete('/history/{order}', [HistoryController::class, 'destroy'])->name('history.destroy');
+
+
 
 
     // Logout

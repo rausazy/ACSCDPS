@@ -27,7 +27,9 @@
                 </div>
                 <div>
                     <h2 class="text-xl font-semibold text-gray-700">Total Revenue</h2>
-                    <p class="text-4xl font-extrabold text-gray-900">₱450,000</p>
+                    <p class="text-4xl font-extrabold text-gray-900">
+                        ₱{{ number_format($totalRevenue ?? 0, 2) }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -55,7 +57,9 @@
                 </div>
                 <div>
                     <h2 class="text-xl font-semibold text-gray-700">Total Net Income</h2>
-                    <p class="text-4xl font-extrabold text-gray-900">₱300,000</p>
+                    <p class="text-4xl font-extrabold text-gray-900">
+                        ₱{{ number_format($totalNetIncome ?? 0, 2) }}
+                    </p>
                 </div>
             </div>
         </div>
