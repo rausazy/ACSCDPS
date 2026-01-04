@@ -337,46 +337,61 @@ function closeModal() {
 function confirmOrder() {
     updateQuotation();
     const rawMaterials = getRawMaterialData();
-    
-    // Simple validation before confirming
-    if (!document.getElementById('customerName').value || !document.getElementById('customerEmail').value || !document.getElementById('customerPhone').value) {
+
+    // validations
+    if (!document.getElementById('customerName').value ||
+        !document.getElementById('customerEmail').value ||
+        !document.getElementById('customerPhone').value) {
         alert('Please fill out Name, Email, and Phone under Customer Details before confirming the order.');
         return;
     }
-    
-    if (rawMaterials.length === 0 || parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) <= 0) {
+
+    if (rawMaterials.length === 0 ||
+        parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) <= 0) {
         alert('Please add raw materials, quantity, and set a valid quotation before confirming the order.');
         return;
     }
-    
-    // This is the data object you will send to your server/backend
-    const orderData = {
-        customer: {
-            name: document.getElementById('customerName').value,
-            email: document.getElementById('customerEmail').value,
-            phone: document.getElementById('customerPhone').value,
-            address: document.getElementById('customerAddress').value,
-        },
-        costing: {
-            raw_materials: rawMaterials,
-            overall_cost: parseFloat(overallCostEl.innerText.replace(/[₱,]/g, '')) || 0,
-        },
-        quotation: {
-            service_name: "{{ $service->name }}",
-            quantity: parseFloat(document.getElementById('quoteQty').value) || 0,
-            cost_per_piece: parseFloat(quoteCostPerPiece.innerText.replace(/[₱,]/g, '')) || 0,
-            markup: parseFloat(document.getElementById('quoteMarkup').value) || 0,
-            selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
-            discount_percentage: parseFloat(document.getElementById('quoteDiscount').value) || 0,
-            total_price: parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0,
-        }
-    };
 
-    // For demonstration, we log the data
-    console.log("Order Data Sent to Server:", orderData);
-    
-    // Show the confirmation modal
-    confirmationModal.style.display = 'block';
+    // ✅ FORM DATA (para gumana $request->all())
+    const formData = new FormData();
+
+    // customer
+    formData.append('customer[name]', document.getElementById('customerName').value);
+    formData.append('customer[email]', document.getElementById('customerEmail').value);
+    formData.append('customer[phone]', document.getElementById('customerPhone').value);
+    formData.append('customer[address]', document.getElementById('customerAddress').value);
+
+    // quotation (MATCH SA HISTORY CONTROLLER)
+    formData.append('quotation[product_name]', "{{ $service->name }}"); // service name
+    formData.append('quotation[quantity]', parseFloat(quoteQty.value) || 0);
+    formData.append('quotation[cost_per_piece]', quoteCostPerPiece.innerText.replace(/[₱,]/g, ''));
+    formData.append('quotation[markup]', parseFloat(quoteMarkup.value) || 0);
+    formData.append('quotation[selling_price_per_piece]', quoteSellingPrice.innerText.replace(/[₱,]/g, ''));
+    formData.append('quotation[discount_percentage]', parseFloat(quoteDiscount.value) || 0);
+    formData.append('quotation[total_price]', quoteTotal.innerText.replace(/[₱,]/g, ''));
+
+    // costing
+    formData.append('costing[overall_cost]', overallCostEl.innerText.replace(/[₱,]/g, ''));
+    formData.append('costing[raw_materials]', JSON.stringify(rawMaterials));
+
+    fetch("{{ route('history.store') }}", {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: formData
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Failed to save order');
+        return res.json();
+    })
+    .then(() => {
+        confirmationModal.style.display = 'block';
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Failed to save order.');
+    });
 }
 
 function preparePdfData(event) {
