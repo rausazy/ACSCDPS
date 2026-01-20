@@ -9,7 +9,10 @@
         <!-- Header + Controls -->
         <div style="display:flex; flex-direction:column; gap:1.5rem; margin-bottom:2.5rem;">
 
-            <div style="display:flex; flex-direction:column; gap:1.5rem;">
+            <!-- Title + Right Controls -->
+            <div style="display:flex; flex-direction:column; gap:1.5rem;"
+                 id="stocksHeaderRow">
+
                 <!-- Left: Title -->
                 <div style="text-align:left;">
                     <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent 
@@ -21,8 +24,9 @@
                     </p>
                 </div>
 
-                <!-- Right: Search + Filters (filters under search) -->
-                <div style="display:flex; flex-direction:column; gap:0.75rem; width:100%; align-items:flex-start;">
+                <!-- Right: Search + Filters -->
+                <div id="rightControls"
+                     style="display:flex; flex-direction:column; gap:0.75rem; width:100%; align-items:flex-start;">
                     <!-- Search -->
                     <input type="text" id="stockSearch"
                         placeholder="Search stocks..."
@@ -31,8 +35,8 @@
                                text-sm sm:text-base shadow-sm"
                         style="width:100%; max-width:18rem;">
 
-                    <!-- Filters (under search) -->
-                    <div style="display:flex; flex-wrap:wrap; gap:0.5rem; width:100%;">
+                    <!-- Filters -->
+                    <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
                         <button type="button"
                             class="stock-filter-btn px-4 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-100 transition text-sm font-medium"
                             data-filter="all">
@@ -52,6 +56,7 @@
                         </button>
                     </div>
                 </div>
+
             </div>
 
         </div>
@@ -78,10 +83,8 @@
                    data-name="{{ strtolower($displayName) }}"
                    style="display:block; text-decoration:none;">
 
-                    <!-- gradient border wrapper -->
                     <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition duration-500 blur-sm"></div>
 
-                    <!-- inner white box -->
                     <div class="relative bg-white rounded-2xl shadow-md group-hover:shadow-2xl p-5 sm:p-7 flex flex-col items-center text-center transition duration-500"
                          style="text-align:center;">
                         <x-dynamic-component
@@ -107,9 +110,10 @@
             @endforeach
         </div>
 
-        <!-- No Results -->
-        <div id="noStockResults" class="hidden mt-10 text-gray-500 text-lg"
-            style="margin-top:2.5rem; text-align:center; width:100%; display:flex; justify-content:center;">
+        <!-- No Results (DEFAULT HIDDEN) -->
+        <div id="noStockResults"
+            style="margin-top:2.5rem; text-align:center; width:100%; display:none; justify-content:center;"
+            class="text-gray-500 text-lg">
             <span>No stocks found.</span>
         </div>
 
@@ -117,42 +121,90 @@
 </div>
 
 <script>
-    // --- Inline responsive alignment for hosted (no CSS dependency) ---
-    // Align header row like: left title, right controls (>=640px), stacked on mobile.
-    (function () {
-        const applyLayout = () => {
-            const isDesktop = window.matchMedia('(min-width: 640px)').matches;
+    /* -------- FORCE RIGHT ALIGN ON DESKTOP (INLINE SAFE) -------- */
+    const headerRow = document.getElementById('stocksHeaderRow');
+    const rightControls = document.getElementById('rightControls');
 
-            // the header wrapper is: PageContainer -> Header+Controls -> (first child) -> (first child)
-            // We'll just find the first flex container that holds title + right controls.
-            const pageContainer = document.querySelector('[data-stocks-page-container]') || null;
-        };
+    function applyHeaderLayout() {
+        const isDesktop = window.matchMedia('(min-width: 640px)').matches;
 
-        // Make the right controls align end on desktop
-        const rightControls = document.querySelector('#stockSearch')?.parentElement;
-        const headerRow = rightControls?.parentElement;
+        headerRow.style.flexDirection = isDesktop ? 'row' : 'column';
+        headerRow.style.justifyContent = isDesktop ? 'space-between' : 'flex-start';
+        headerRow.style.alignItems = isDesktop ? 'flex-start' : 'stretch';
 
-        const setHeaderLayout = () => {
-            const isDesktop = window.matchMedia('(min-width: 640px)').matches;
+        rightControls.style.alignItems = isDesktop ? 'flex-end' : 'flex-start';
+        rightControls.style.width = isDesktop ? 'auto' : '100%';
+    }
 
-            if (headerRow) {
-                headerRow.style.display = 'flex';
-                headerRow.style.gap = '1.5rem';
-                headerRow.style.flexDirection = isDesktop ? 'row' : 'column';
-                headerRow.style.alignItems = isDesktop ? 'flex-start' : 'stretch';
-                headerRow.style.justifyContent = isDesktop ? 'space-between' : 'flex-start';
+    applyHeaderLayout();
+    window.addEventListener('resize', applyHeaderLayout);
+
+    /* -------- STACK GRID ON MOBILE (INLINE SAFE) -------- */
+    const stocksGrid = document.getElementById('stocksGrid');
+
+    function applyGridLayout() {
+        const isDesktop = window.matchMedia('(min-width: 640px)').matches;
+
+        if (!isDesktop) {
+            stocksGrid.style.gridTemplateColumns = 'repeat(1, minmax(0, 1fr))';
+            stocksGrid.style.gap = '1rem';
+        } else {
+            stocksGrid.style.gridTemplateColumns = '';
+            stocksGrid.style.gap = '';
+        }
+    }
+
+    applyGridLayout();
+    window.addEventListener('resize', applyGridLayout);
+
+    function applyMobileCardSizing() {
+    const isMobile = window.matchMedia('(max-width: 639px)').matches;
+
+    document.querySelectorAll('.stock-card').forEach(card => {
+        const inner = card.querySelector('div.relative.bg-white'); // yung inner white box mo
+        const icon = card.querySelector('svg');                    // heroicon svg
+        const name = card.querySelector('h2');                     // title
+        const tag = card.querySelector('p.text-xs');               // tag (PRODUCT/SERVICE)
+        const qty = card.querySelector('p.text-sm');               // quantity
+
+        if (!inner) return;
+
+        if (isMobile) {
+            // shrink padding
+            inner.style.padding = '0.9rem';
+
+            // shrink icon
+            if (icon) {
+                icon.style.width = '32px';
+                icon.style.height = '32px';
+                icon.style.marginBottom = '0.5rem';
             }
 
-            if (rightControls) {
-                rightControls.style.alignItems = isDesktop ? 'flex-end' : 'flex-start';
-                rightControls.style.width = isDesktop ? 'auto' : '100%';
+            // tighten text spacing a bit
+            if (name) name.style.fontSize = '0.95rem';
+            if (tag)  tag.style.marginTop = '0.4rem';
+            if (qty)  qty.style.marginTop = '0.35rem';
+        } else {
+            // remove overrides so desktop goes back to normal Tailwind sizes
+            inner.style.padding = '';
+
+            if (icon) {
+                icon.style.width = '';
+                icon.style.height = '';
+                icon.style.marginBottom = '';
             }
-        };
 
-        setHeaderLayout();
-        window.addEventListener('resize', setHeaderLayout);
-    })();
+            if (name) name.style.fontSize = '';
+            if (tag)  tag.style.marginTop = '';
+            if (qty)  qty.style.marginTop = '';
+        }
+    });
+}
 
+applyMobileCardSizing();
+window.addEventListener('resize', applyMobileCardSizing);
+
+    /* -------- FILTER + SEARCH -------- */
     const filterBtns = document.querySelectorAll('.stock-filter-btn');
     const stockCards = document.querySelectorAll('.stock-card');
     const noStockResults = document.getElementById('noStockResults');
@@ -160,14 +212,17 @@
 
     let activeFilter = 'all';
 
+    // ✅ INLINE ACTIVE STYLE (works on mobile tap too)
     function setActiveButton(activeBtn) {
         filterBtns.forEach(btn => {
-            btn.classList.remove('bg-purple-600', 'text-white', 'border-purple-600');
-            btn.classList.add('bg-white', 'text-gray-800', 'border-gray-300');
+            btn.style.backgroundColor = '#ffffff';
+            btn.style.borderColor = '#d1d5db'; // gray-300
+            btn.style.color = '#1f2937';       // gray-800
         });
 
-        activeBtn.classList.remove('bg-white', 'text-gray-800', 'border-gray-300');
-        activeBtn.classList.add('bg-purple-600', 'text-white', 'border-purple-600');
+        activeBtn.style.backgroundColor = '#7c3aed'; // purple-600
+        activeBtn.style.borderColor = '#7c3aed';
+        activeBtn.style.color = '#ffffff';
     }
 
     function applyFilterAndSearch() {
@@ -189,15 +244,12 @@
             }
         });
 
-        if (visibleCount === 0) noStockResults.classList.remove('hidden');
-        else noStockResults.classList.add('hidden');
+        noStockResults.style.display = visibleCount === 0 ? 'flex' : 'none';
     }
 
-    // Default active = all
     const defaultBtn = document.querySelector('.stock-filter-btn[data-filter="all"]');
     if (defaultBtn) {
         setActiveButton(defaultBtn);
-        activeFilter = 'all';
         applyFilterAndSearch();
     }
 
