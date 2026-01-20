@@ -75,6 +75,11 @@
                     }
 
                     $displayName = optional($stock->stockable)->name ?? $stock->name;
+
+                    // ✅ INLINE TAG COLORS (host-safe)
+                    $tagStyle = 'background:#f3f4f6; color:#374151;'; // other default gray
+                    if ($type === 'product') $tagStyle = 'background:#f3e8ff; color:#6b21a8;'; // purple-ish
+                    if ($type === 'service') $tagStyle = 'background:#dbeafe; color:#1d4ed8;'; // blue-ish
                 @endphp
 
                 <a href="{{ route('stocks.show', $stock->id) }}"
@@ -95,10 +100,9 @@
                             {{ $displayName }}
                         </h2>
 
-                        <p class="text-xs font-semibold mt-2 px-3 py-1 rounded-full
-                            {{ $type === 'product' ? 'bg-purple-100 text-purple-700' : '' }}
-                            {{ $type === 'service' ? 'bg-blue-100 text-blue-700' : '' }}
-                            {{ $type === 'other' ? 'bg-gray-100 text-gray-700' : '' }}">
+                        <!-- ✅ TAG PILL (INLINE STYLE so it works in hosted) -->
+                        <p class="text-xs font-semibold mt-2 px-3 py-1 rounded-full"
+                           style="{{ $tagStyle }}">
                             {{ strtoupper($type) }}
                         </p>
 
@@ -157,52 +161,49 @@
     applyGridLayout();
     window.addEventListener('resize', applyGridLayout);
 
+    /* -------- MOBILE CARD SIZE (ONLY MOBILE) -------- */
     function applyMobileCardSizing() {
-    const isMobile = window.matchMedia('(max-width: 639px)').matches;
+        const isMobile = window.matchMedia('(max-width: 639px)').matches;
 
-    document.querySelectorAll('.stock-card').forEach(card => {
-        const inner = card.querySelector('div.relative.bg-white'); // yung inner white box mo
-        const icon = card.querySelector('svg');                    // heroicon svg
-        const name = card.querySelector('h2');                     // title
-        const tag = card.querySelector('p.text-xs');               // tag (PRODUCT/SERVICE)
-        const qty = card.querySelector('p.text-sm');               // quantity
+        document.querySelectorAll('.stock-card').forEach(card => {
+            const inner = card.querySelector('div.relative.bg-white');
+            const icon = card.querySelector('svg');
+            const name = card.querySelector('h2');
+            const tag  = card.querySelector('p.text-xs');
+            const qty  = card.querySelector('p.text-sm');
 
-        if (!inner) return;
+            if (!inner) return;
 
-        if (isMobile) {
-            // shrink padding
-            inner.style.padding = '0.9rem';
+            if (isMobile) {
+                inner.style.padding = '0.9rem';
 
-            // shrink icon
-            if (icon) {
-                icon.style.width = '32px';
-                icon.style.height = '32px';
-                icon.style.marginBottom = '0.5rem';
+                if (icon) {
+                    icon.style.width = '32px';
+                    icon.style.height = '32px';
+                    icon.style.marginBottom = '0.5rem';
+                }
+
+                if (name) name.style.fontSize = '0.95rem';
+                if (tag)  tag.style.marginTop = '0.4rem';
+                if (qty)  qty.style.marginTop = '0.35rem';
+            } else {
+                inner.style.padding = '';
+
+                if (icon) {
+                    icon.style.width = '';
+                    icon.style.height = '';
+                    icon.style.marginBottom = '';
+                }
+
+                if (name) name.style.fontSize = '';
+                if (tag)  tag.style.marginTop = '';
+                if (qty)  qty.style.marginTop = '';
             }
+        });
+    }
 
-            // tighten text spacing a bit
-            if (name) name.style.fontSize = '0.95rem';
-            if (tag)  tag.style.marginTop = '0.4rem';
-            if (qty)  qty.style.marginTop = '0.35rem';
-        } else {
-            // remove overrides so desktop goes back to normal Tailwind sizes
-            inner.style.padding = '';
-
-            if (icon) {
-                icon.style.width = '';
-                icon.style.height = '';
-                icon.style.marginBottom = '';
-            }
-
-            if (name) name.style.fontSize = '';
-            if (tag)  tag.style.marginTop = '';
-            if (qty)  qty.style.marginTop = '';
-        }
-    });
-}
-
-applyMobileCardSizing();
-window.addEventListener('resize', applyMobileCardSizing);
+    applyMobileCardSizing();
+    window.addEventListener('resize', applyMobileCardSizing);
 
     /* -------- FILTER + SEARCH -------- */
     const filterBtns = document.querySelectorAll('.stock-filter-btn');
@@ -212,15 +213,14 @@ window.addEventListener('resize', applyMobileCardSizing);
 
     let activeFilter = 'all';
 
-    // ✅ INLINE ACTIVE STYLE (works on mobile tap too)
     function setActiveButton(activeBtn) {
         filterBtns.forEach(btn => {
             btn.style.backgroundColor = '#ffffff';
-            btn.style.borderColor = '#d1d5db'; // gray-300
-            btn.style.color = '#1f2937';       // gray-800
+            btn.style.borderColor = '#d1d5db';
+            btn.style.color = '#1f2937';
         });
 
-        activeBtn.style.backgroundColor = '#7c3aed'; // purple-600
+        activeBtn.style.backgroundColor = '#7c3aed';
         activeBtn.style.borderColor = '#7c3aed';
         activeBtn.style.color = '#ffffff';
     }
