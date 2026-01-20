@@ -13,8 +13,9 @@
     @endif
 
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full max-w-7xl mb-14 px-4 sm:px-6 lg:px-8">
-        <div class="mb-6 sm:mb-0 text-center sm:text-left">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full max-w-7xl mb-14 px-4 sm:px-6 lg:px-8 gap-4">
+
+        <div class="text-center sm:text-left">
             <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent 
                bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 
                leading-tight pb-2">
@@ -25,22 +26,35 @@
             </p>
         </div>
 
-        <!-- Add Product Button (like Stocks) -->
-        <button id="open-modal" 
-            class="flex items-center justify-center gap-2 px-4 py-2 sm:px-10 sm:py-3 
-                   rounded-xl bg-white border-1 border-black 
-                   text-gray-900 font-bold shadow-md 
-                   hover:bg-purple-100 hover:shadow-lg 
-                   transition transform hover:-translate-y-1 hover:scale-105">
-            <span class="text-lg sm:text-lg font-bold">+</span>
-            <span class="text-xs sm:text-sm">Add Product</span>
-        </button>
+        <!-- Right Side Controls -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 w-full sm:w-auto">
+
+            <!-- Search Bar -->
+            <input type="text" id="productSearch"
+                placeholder="Search products..."
+                class="w-full sm:w-72 border border-gray-300 rounded-xl px-4 py-2 
+                       focus:outline-none focus:ring-2 focus:ring-purple-500
+                       text-sm sm:text-base shadow-sm">
+
+            <!-- Add Product Button -->
+            <button id="open-modal" 
+                class="flex items-center justify-center gap-2 px-4 py-2 sm:px-10 sm:py-3 
+                       rounded-xl bg-white border-1 border-black 
+                       text-gray-900 font-bold shadow-md 
+                       hover:bg-purple-100 hover:shadow-lg 
+                       transition transform hover:-translate-y-1 hover:scale-105">
+                <span class="text-lg sm:text-lg font-bold">+</span>
+                <span class="text-xs sm:text-sm">Add Product</span>
+            </button>
+        </div>
     </div>
 
     <!-- Products Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         @foreach ($products as $product)
-        <div class="relative group">
+        <div class="relative group product-card" 
+             data-name="{{ strtolower($product->name) }}">
+
             <!-- Delete Button -->
             <form action="{{ route('products.destroy', $product->id) }}" method="POST"
                   class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
@@ -73,10 +87,16 @@
         </div>
         @endforeach
     </div>
+
+    <!-- No Results Message -->
+    <div id="noResults" class="hidden mt-10 text-gray-500 text-lg">
+        No products found.
+    </div>
+
 </div>
 
 <!-- Add Product Modal -->
-<div id="modal" class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+<div id="modal" class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 z-50">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-xs sm:max-w-md p-4 sm:p-6 transform scale-95 transition-transform duration-300">
         <h2 class="text-2xl font-bold mb-4">Add Product</h2>
 
@@ -94,9 +114,9 @@
                 <input type="text" name="name" required
                     class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base">
             </div>
+
             <div class="mb-4">
                 <label class="block text-gray-700 font-medium mb-1">Icon</label>
-
                 @php
                 $icons = [
                     'shopping-bag' => 'Shopping Bag',
@@ -125,6 +145,7 @@
                     @endforeach
                 </select>
             </div>
+
             <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-6">
                 <button type="button" id="cancel-modal"
                     class="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 transition w-full sm:w-auto text-sm sm:text-base">
@@ -152,6 +173,15 @@
 </div>
 
 <script>
+    // ===== HELPERS: LOCK/UNLOCK BACKGROUND (MOBILE CLICK/SCROLL) =====
+    function lockBody() {
+        document.body.classList.add('overflow-hidden', 'touch-none');
+    }
+
+    function unlockBody() {
+        document.body.classList.remove('overflow-hidden', 'touch-none');
+    }
+
     // ----- ERROR BANNER AUTO-HIDE -----
     const errorBanner = document.getElementById('error-banner');
     if (errorBanner) {
@@ -164,7 +194,7 @@
     // ----- BANNERS FADE-IN/OUT -----
     ['success-banner','delete-banner'].forEach(id => {
         const banner = document.getElementById(id);
-        if(banner){
+        if (banner) {
             banner.classList.add('opacity-0');
             setTimeout(() => banner.classList.remove('opacity-0'), 10);
             setTimeout(() => {
@@ -182,6 +212,8 @@
     const modalContent = modal.querySelector('div');
 
     function openModal() {
+        lockBody();
+
         modal.classList.remove('opacity-0', 'pointer-events-none');
         modalContent.classList.remove('scale-95');
         modalContent.classList.add('scale-100', 'opacity-0');
@@ -194,12 +226,18 @@
             modal.classList.add('opacity-0', 'pointer-events-none');
             modalContent.classList.remove('scale-100');
             modalContent.classList.add('scale-95');
+
+            unlockBody();
         }, 300);
     }
 
     openModalBtn.addEventListener('click', openModal);
     cancelModalBtn.addEventListener('click', closeModal);
     addProductForm.addEventListener('submit', () => closeModal());
+
+
+    // Prevent click bubbling from modal content to overlay
+    modalContent.addEventListener('click', (e) => e.stopPropagation());
 
     // Auto open modal if there are errors
     @if ($errors->any())
@@ -210,35 +248,80 @@
     const deleteModal = document.getElementById('delete-modal');
     const cancelDeleteBtn = document.getElementById('cancel-delete');
     const confirmDeleteBtn = document.getElementById('confirm-delete');
+    const deleteModalContent = deleteModal.querySelector('div');
     let deleteForm;
+
+    function openDeleteModal(productName, form) {
+        lockBody();
+        deleteForm = form;
+
+        document.getElementById('delete-product-name').textContent = `Are you sure you want to delete "${productName}"?`;
+
+        deleteModal.classList.remove('opacity-0', 'pointer-events-none');
+        deleteModalContent.classList.remove('scale-95');
+        deleteModalContent.classList.add('scale-100', 'opacity-0');
+        setTimeout(() => deleteModalContent.classList.remove('opacity-0'), 10);
+    }
+
+    function closeDeleteModal() {
+        deleteModalContent.classList.add('opacity-0');
+        setTimeout(() => {
+            deleteModal.classList.add('opacity-0', 'pointer-events-none');
+            deleteModalContent.classList.remove('scale-100');
+            deleteModalContent.classList.add('scale-95');
+
+            unlockBody();
+        }, 300);
+    }
 
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
-            deleteForm = btn.closest('form');
+            const form = btn.closest('form');
             const productName = btn.dataset.name;
-            document.getElementById('delete-product-name').textContent = `Are you sure you want to delete "${productName}"?`;
-
-            deleteModal.classList.remove('opacity-0', 'pointer-events-none');
-            const content = deleteModal.querySelector('div');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100', 'opacity-0');
-            setTimeout(() => content.classList.remove('opacity-0'), 10);
+            openDeleteModal(productName, form);
         });
     });
 
-    cancelDeleteBtn.addEventListener('click', () => {
-        const content = deleteModal.querySelector('div');
-        content.classList.add('opacity-0');
-        setTimeout(() => {
-            deleteModal.classList.add('opacity-0', 'pointer-events-none');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-        }, 300);
-    });
+    cancelDeleteBtn.addEventListener('click', closeDeleteModal);
 
     confirmDeleteBtn.addEventListener('click', () => {
-        if(deleteForm) deleteForm.submit();
+        if (deleteForm) deleteForm.submit();
+    });
+
+    // Close delete modal when clicking outside (overlay)
+    deleteModal.addEventListener('click', (e) => {
+        if (e.target === deleteModal) closeDeleteModal();
+    });
+
+    // Prevent click bubbling from delete modal content to overlay
+    deleteModalContent.addEventListener('click', (e) => e.stopPropagation());
+
+    // ----- PRODUCT SEARCH -----
+    const productSearch = document.getElementById('productSearch');
+    const productCards = document.querySelectorAll('.product-card');
+    const noResults = document.getElementById('noResults');
+
+    productSearch.addEventListener('input', () => {
+        const term = productSearch.value.toLowerCase();
+        let visibleCount = 0;
+
+        productCards.forEach(card => {
+            const name = card.dataset.name;
+
+            if (name.includes(term)) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (visibleCount === 0) {
+            noResults.classList.remove('hidden');
+        } else {
+            noResults.classList.add('hidden');
+        }
     });
 </script>
 @endsection
