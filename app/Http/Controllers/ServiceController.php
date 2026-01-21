@@ -52,6 +52,35 @@ class ServiceController extends Controller
         return redirect()->route('services.services')->with('success', 'Service added!');
     }
 
+    public function update(Request $request, Service $service)
+{
+    $request->validate([
+        'name' => 'required|string|max:255|unique:services,name,' . $service->id,
+        'icon' => 'nullable|string|max:255',
+    ]);
+
+    // old name (for stock sync)
+    $oldName = $service->name;
+
+    // update service fields
+    $service->name = $request->name;
+    $service->icon = $request->icon;
+
+    // OPTIONAL: kung gusto mo magbago din url kapag nagrename
+    // WARNING: mababago link ng service page
+    // $service->url = Str::slug($request->name);
+
+    $service->save();
+
+    // ✅ sync stock name (if you have `name` column in stocks)
+    if ($service->stock) {
+        $service->stock->update([
+            'name' => $service->name,
+        ]);
+    }
+
+    return redirect()->route('services.services')->with('success', 'Service updated!');
+}
     public function destroy(Service $service)
     {
         // Delete stock entry first (if exists)

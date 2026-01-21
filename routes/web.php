@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
     Route::delete('/services/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
     Route::get('/services/{url}', [ServiceController::class, 'show'])->name('services.show');
+    Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
 
     // History
     Route::get('/history', [HistoryController::class, 'index'])->name('history.history');
