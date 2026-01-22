@@ -68,22 +68,21 @@
     <!-- Low Stock + Best Seller -->
     <div class="w-full max-w-6xl mb-16">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Low on Stock -->
+                    <!-- Low on Stock -->
             <div class="bg-white rounded-2xl shadow-lg p-8">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">⚠️ Low on Stock</h2>
+
                 <ul class="divide-y divide-gray-200">
-                    <li class="flex justify-between items-center py-2 text-gray-700">
-                        <span>Paper</span>
-                        <span class="text-red-600 font-semibold">5 left</span>
-                    </li>
-                    <li class="flex justify-between items-center py-2 text-gray-700">
-                        <span>Shirts</span>
-                        <span class="text-red-600 font-semibold">8 left</span>
-                    </li>
-                    <li class="flex justify-between items-center py-2 text-gray-700">
-                        <span>Ink</span>
-                        <span class="text-red-600 font-semibold">3 left</span>
-                    </li>
+                    @forelse($lowStocks as $item)
+                        <li class="flex justify-between items-center py-2 text-gray-700">
+                            <span>{{ $item->name }}</span>
+                            <span class="text-red-600 font-semibold">{{ $item->quantity }} left</span>
+                        </li>
+                    @empty
+                        <li class="py-2 text-gray-500 italic">
+                            No low stock items.
+                        </li>
+                    @endforelse
                 </ul>
             </div>
 

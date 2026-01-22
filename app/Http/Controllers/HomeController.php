@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Stock;
 use App\Models\Order;
+use App\Models\RawMaterial;
 
 class HomeController extends Controller
 {
@@ -19,6 +20,16 @@ class HomeController extends Controller
         // ✅ NET INCOME
         $totalNetIncome = $totalRevenue - $overallExpenses;
 
-        return view('home', compact('overallExpenses', 'totalRevenue', 'totalNetIncome'));
+        // ✅ LOW STOCK (raw materials na below 10)
+        $lowStocks = RawMaterial::where('quantity', '<', 10)
+            ->orderBy('quantity', 'asc')
+            ->get();
+
+        return view('home', compact(
+            'overallExpenses',
+            'totalRevenue',
+            'totalNetIncome',
+            'lowStocks'
+        ));
     }
 }
