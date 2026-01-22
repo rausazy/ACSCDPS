@@ -339,7 +339,34 @@ function confirmOrder() {
     updateQuotation();
 
     const rawMaterials = getRawMaterialData();
-    
+
+    // ✅ VALIDATIONS (para di ka mag-send ng 0 / blank)
+    if (!document.getElementById('customerName').value.trim() ||
+        !document.getElementById('customerEmail').value.trim() ||
+        !document.getElementById('customerPhone').value.trim()) {
+        alert('Please fill out Name, Email, and Phone under Customer Details before confirming the order.');
+        return;
+    }
+
+    const q = parseFloat(document.getElementById('quoteQty').value) || 0;
+    const total = parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0;
+
+    if (q <= 0) {
+        alert('Please set Quantity to at least 1.');
+        return;
+    }
+
+    if (rawMaterials.length === 0) {
+        alert('Please add raw materials before confirming the order.');
+        return;
+    }
+
+    if (total <= 0) {
+        alert('Please set a valid quotation (total price must be > 0).');
+        return;
+    }
+
+    // ✅ build payload
     const orderData = {
         customer: {
             name: document.getElementById('customerName').value,
@@ -353,29 +380,49 @@ function confirmOrder() {
         },
         quotation: {
             product_name: "{{ $product->name }}",
-            quantity: parseFloat(document.getElementById('quoteQty').value) || 0,
+            quantity: q,
             cost_per_piece: parseFloat(quoteCostPerPiece.innerText.replace(/[₱,]/g, '')) || 0,
             markup: parseFloat(document.getElementById('quoteMarkup').value) || 0,
             selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
             discount_percentage: parseFloat(document.getElementById('quoteDiscount').value) || 0,
-            total_price: parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0,
+            total_price: total,
         }
     };
+
+    // ✅ disable button while sending (avoid double click)
+    const btn = document.getElementById('confirmOrderBtn');
+    if (btn) btn.disabled = true;
 
     fetch("{{ route('history.store') }}", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "Accept": "application/json",
             "X-CSRF-TOKEN": "{{ csrf_token() }}"
         },
         body: JSON.stringify(orderData)
     })
-    .then(res => res.json())
-    .then(data => {
+    .then(async (res) => {
+        const text = await res.text();
+        let payload = {};
+        try { payload = JSON.parse(text); } catch (e) {}
+
+        if (!res.ok) {
+            console.error("STATUS:", res.status);
+            console.error("RESPONSE:", text);
+            alert(payload.message || `Failed to save order (${res.status}). Check console.`);
+            return;
+        }
+
+        // ✅ success
         confirmationModal.style.display = 'block';
     })
     .catch(err => {
         console.error("Error saving order:", err);
+        alert("Network/JS error. Check console.");
+    })
+    .finally(() => {
+        if (btn) btn.disabled = false;
     });
 }
 

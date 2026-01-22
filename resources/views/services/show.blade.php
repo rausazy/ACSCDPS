@@ -336,6 +336,7 @@ function closeModal() {
 
 function confirmOrder() {
     updateQuotation();
+
     const rawMaterials = getRawMaterialData();
 
     // validations
@@ -346,46 +347,52 @@ function confirmOrder() {
         return;
     }
 
-    if (rawMaterials.length === 0 ||
-        parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) <= 0) {
+    const qty = parseFloat(quoteQty.value) || 0;
+    const totalPrice = parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0;
+
+    if (rawMaterials.length === 0 || qty <= 0 || totalPrice <= 0) {
         alert('Please add raw materials, quantity, and set a valid quotation before confirming the order.');
         return;
     }
 
-    // ✅ FORM DATA (para gumana $request->all())
-    const formData = new FormData();
-
-    // customer
-    formData.append('customer[name]', document.getElementById('customerName').value);
-    formData.append('customer[email]', document.getElementById('customerEmail').value);
-    formData.append('customer[phone]', document.getElementById('customerPhone').value);
-    formData.append('customer[address]', document.getElementById('customerAddress').value);
-
-    // quotation (MATCH SA HISTORY CONTROLLER)
-    formData.append('quotation[product_name]', "{{ $service->name }}"); // service name
-    formData.append('quotation[quantity]', parseFloat(quoteQty.value) || 0);
-    formData.append('quotation[cost_per_piece]', quoteCostPerPiece.innerText.replace(/[₱,]/g, ''));
-    formData.append('quotation[markup]', parseFloat(quoteMarkup.value) || 0);
-    formData.append('quotation[selling_price_per_piece]', quoteSellingPrice.innerText.replace(/[₱,]/g, ''));
-    formData.append('quotation[discount_percentage]', parseFloat(quoteDiscount.value) || 0);
-    formData.append('quotation[total_price]', quoteTotal.innerText.replace(/[₱,]/g, ''));
-
-    // costing
-    formData.append('costing[overall_cost]', overallCostEl.innerText.replace(/[₱,]/g, ''));
-    formData.append('costing[raw_materials]', JSON.stringify(rawMaterials));
+    // ✅ SAME FORMAT AS PRODUCTS
+    const orderData = {
+        customer: {
+            name: document.getElementById('customerName').value,
+            email: document.getElementById('customerEmail').value,
+            phone: document.getElementById('customerPhone').value,
+            address: document.getElementById('customerAddress').value,
+        },
+        costing: {
+            overall_cost: parseFloat(overallCostEl.innerText.replace(/[₱,]/g, '')) || 0,
+            raw_materials: rawMaterials, // ✅ array, NOT JSON.stringify
+        },
+        quotation: {
+            product_name: "{{ $service->name }}", // keep product_name for history column
+            quantity: qty,
+            cost_per_piece: parseFloat(quoteCostPerPiece.innerText.replace(/[₱,]/g, '')) || 0,
+            markup: parseFloat(quoteMarkup.value) || 0,
+            selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
+            discount_percentage: parseFloat(quoteDiscount.value) || 0,
+            total_price: totalPrice,
+        }
+    };
 
     fetch("{{ route('history.store') }}", {
         method: "POST",
         headers: {
+            "Content-Type": "application/json",
             "X-CSRF-TOKEN": "{{ csrf_token() }}"
         },
-        body: formData
+        body: JSON.stringify(orderData)
     })
-    .then(res => {
-        if (!res.ok) throw new Error('Failed to save order');
-        return res.json();
-    })
-    .then(() => {
+    .then(async res => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            console.error("Failed:", data);
+            alert(data?.message || "Failed to save order.");
+            return;
+        }
         confirmationModal.style.display = 'block';
     })
     .catch(err => {
@@ -393,6 +400,7 @@ function confirmOrder() {
         alert('Failed to save order.');
     });
 }
+
 
 function preparePdfData(event) {
     if (event) event.preventDefault();
