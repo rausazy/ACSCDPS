@@ -100,7 +100,6 @@
                             {{ $displayName }}
                         </h2>
 
-                        <!-- ✅ TAG PILL (INLINE STYLE so it works in hosted) -->
                         <p class="text-xs font-semibold mt-2 px-3 py-1 rounded-full"
                            style="{{ $tagStyle }}">
                             {{ strtoupper($type) }}
@@ -114,7 +113,6 @@
             @endforeach
         </div>
 
-        <!-- No Results (DEFAULT HIDDEN) -->
         <div id="noStockResults"
             style="margin-top:2.5rem; text-align:center; width:100%; display:none; justify-content:center;"
             class="text-gray-500 text-lg">

@@ -21,6 +21,8 @@ Route::middleware('auth')->group(function () {
     // Home
     Route::get('/', fn () => view('home'))->name('home');
     Route::get('/profile', fn () => view('profile'))->name('profile');
+    Route::post('/analytics/export-pdf', [HomeController::class, 'exportAnalyticsPdf'])
+    ->name('analytics.export.pdf');
 
     // Stocks
     Route::get('/stocks', [StocksController::class, 'index'])->name('stocks.stocks');
