@@ -95,8 +95,8 @@
         </table>
 
         <div style="margin-top:1.5rem; text-align:right;">
-            <h3 style="font-size:1.125rem; font-weight:700; color:#1f2937; margin:0.25rem 0;">Overall Cost: <span id="overallCost" style="color:#ef4444;">₱0.00</span></h3>
-            <h3 style="font-size:1.125rem; font-weight:700; color:#1f2937; margin:0.25rem 0;">Overall Revenue: <span id="overallRevenue" style="color:#10b981;">₱0.00</span></h3>
+            <h3 style="font-size:1.125rem; font-weight:700; color:#1f2937; margin:0.25rem 0;">Overall Cost: <span id="overallCost" style="color:#000000;">₱0.00</span></h3>
+            <h3 style="font-size:1.125rem; font-weight:700; color:#1f2937; margin:0.25rem 0;">Overall Revenue: <span id="overallRevenue" style="color:#000000;">₱0.00</span></h3>
         </div>
     @else
         <p style="color:#6b7280; padding:1rem; border:1px dashed #d1d5db; border-radius:0.5rem; text-align:center;">No raw materials available for this service.</p>
@@ -140,12 +140,12 @@
                     <input type="number" id="quoteQty" min="1" value="0"
                         style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none; text-align: center;">
                 </td>
-                <td id="quoteCostPerPiece" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; color:#ef4444; font-weight:500;" data-label="Cost per Unit">₱0.00</td>
+                <td id="quoteCostPerPiece" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; color:#000000; font-weight:500;" data-label="Cost per Unit">₱0.00</td>
                 <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Markup per Unit">
                     <input type="number" id="quoteMarkup" step="0.01" value="0"
                         style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none; text-align: center;">
                 </td>
-                <td id="quoteSellingPrice" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; color:#10b981; font-weight:700;" data-label="Selling Price">₱0.00</td>
+                <td id="quoteSellingPrice" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; color:#000000; font-weight:700;" data-label="Selling Price">₱0.00</td>
                 <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Discount">
                     <input type="number" id="quoteDiscount" step="0.01" value="0"
                         style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none; text-align: center;">

@@ -428,18 +428,45 @@ function confirmOrder() {
 
 function preparePdfData(event) {
     if (event) event.preventDefault();
+
+    // make sure computed values updated
     updateQuotation();
 
+    const qty = parseFloat(document.getElementById('quoteQty').value) || 0;
+    const total = parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0;
+
+    // ✅ BLOCK EXPORT kapag walang laman / zero
+    if (qty <= 0) {
+        alert('Please set Quantity to at least 1 before exporting.');
+        return;
+    }
+
+    if (total <= 0) {
+        alert('Total price must be greater than 0 before exporting.');
+        return;
+    }
+
+    // Optional: require customer name/email/phone bago export
+    const name = document.getElementById('customerName').value.trim();
+    const email = document.getElementById('customerEmail').value.trim();
+    const phone = document.getElementById('customerPhone').value.trim();
+
+    if (!name || !email || !phone) {
+        alert('Please fill out Name, Email, and Phone under Customer Details before exporting.');
+        return;
+    }
+
+    // ✅ build payload
     const data = {
         product: "{{ $product->name }}",
-        quantity: document.getElementById('quoteQty').value || 0,
+        quantity: qty,
         selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
         discount: parseFloat(document.getElementById('quoteDiscount').value) || 0,
-        total_price: parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0,
+        total_price: total,
         customer: {
-            name: document.getElementById('customerName').value,
-            email: document.getElementById('customerEmail').value,
-            phone: document.getElementById('customerPhone').value,
+            name: name,
+            email: email,
+            phone: phone,
             address: document.getElementById('customerAddress').value,
         }
     };
