@@ -69,14 +69,6 @@
                 class="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-md 
                         bg-purple-600 
                         py-1 shadow-lg ring-1 ring-black ring-opacity-5 hidden transform transition-all duration-200 ease-out scale-95 opacity-0">
-                <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/20 rounded">
-                    <!-- Profile icon -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12 12c2.21 0 4-1.79 4-4S14.21 4 12 4 8 5.79 8 8s1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4
-                        v2h16v-2c0-2.66-5.33-4-8-4z" clip-rule="evenodd" />
-                    </svg>
-                    Your Profile
-                </a>
 
                 <!-- Logout form -->
                 <form action="{{ route('logout') }}" method="POST" class="flex items-center gap-2 px-4 py-2 text-sm text-white hover:bg-white/20 rounded">
