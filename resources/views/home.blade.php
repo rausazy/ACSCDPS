@@ -104,17 +104,39 @@
 
     <div class="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-8">
 
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-            <h2 class="text-3xl font-bold text-gray-800">📊 Monthly Analytics</h2>
+        <!-- ✅ Row 1: Title + Dropdown -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-5 mb-2 w-full">   
+            <h2 class="text-3xl font-bold text-gray-800 leading-tight">
+                📊 Monthly Analytics
+            </h2>
 
-            <form id="exportPdfForm" method="POST" action="{{ route('analytics.export.pdf') }}">
+<select id="yearSelect"
+    class="border border-gray-300 rounded-xl px-4 py-2 
+           text-sm sm:text-base
+           focus:outline-none focus:ring-2 focus:ring-purple-500 
+           shadow-sm w-fit sm:ml-3">
+                @foreach($availableYears as $yr)
+                    <option value="{{ $yr }}" {{ (int)$selectedYear === (int)$yr ? 'selected' : '' }}>
+                        {{ $yr }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- ✅ Row 2: Export Button BELOW (RIGHT aligned) -->
+        <div class="w-full mb-6 flex justify-end" style="width:100%; display:flex; justify-content:flex-end; margin-bottom:24px;">
+            <form id="exportPdfForm" method="POST" action="{{ route('analytics.export.pdf') }}"
+                  style="display:inline-flex; justify-content:flex-end; width:auto;">
                 @csrf
                 <input type="hidden" name="chart_image" id="chartImageInput">
+                <input type="hidden" name="year" id="yearInput" value="{{ $selectedYear }}">
 
                 <button type="button" id="exportPdfBtn"
-                    class="inline-flex items-center gap-2 px-10 py-2 
-                           bg-purple-600 text-white font-semibold rounded-xl 
-                           shadow hover:bg-purple-700 transition">
+                    style="display:inline-flex;align-items:center;gap:8px;
+                           padding:8px 20px;
+                           background:#7c3aed;color:white;font-weight:700;
+                           border-radius:12px;border:none;cursor:pointer;
+                           box-shadow:0 4px 10px rgba(0,0,0,0.12);">
                     Export to PDF
                 </button>
             </form>
@@ -142,8 +164,24 @@
         const exportBtn = document.getElementById('exportPdfBtn');
         const chartImageInput = document.getElementById('chartImageInput');
 
+        const yearSelect = document.getElementById('yearSelect');
+        const yearInput = document.getElementById('yearInput');
+
+        if (yearSelect) {
+            yearSelect.addEventListener('change', function () {
+                const yr = this.value;
+                if (yearInput) yearInput.value = yr;
+
+                const url = new URL(window.location.href);
+                url.searchParams.set('year', yr);
+                window.location.href = url.toString();
+            });
+        }
+
+        if (yearSelect && yearInput) yearInput.value = yearSelect.value;
+
         const uiCanvas = document.getElementById('monthlyChart');
-        const uiChart = new Chart(uiCanvas, {
+        new Chart(uiCanvas, {
             type: 'line',
             data: {
                 labels: labels,
@@ -172,7 +210,6 @@
 
         function buildPdfChart() {
             const pdfCanvas = document.getElementById('monthlyChartPdf');
-
             pdfCanvas.width = 1100;
             pdfCanvas.height = 520;
 
@@ -207,11 +244,12 @@
         }
 
         exportBtn.addEventListener('click', function () {
-           
             exportBtn.disabled = true;
-            exportBtn.classList.add('opacity-70', 'cursor-not-allowed');
+            exportBtn.style.opacity = "0.7";
+            exportBtn.style.cursor = "not-allowed";
 
-            
+            if (yearSelect && yearInput) yearInput.value = yearSelect.value;
+
             if (typeof Chart === 'undefined') {
                 chartImageInput.value = '';
                 exportForm.submit();
@@ -233,7 +271,8 @@
 
                 setTimeout(() => {
                     exportBtn.disabled = false;
-                    exportBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                    exportBtn.style.opacity = "1";
+                    exportBtn.style.cursor = "pointer";
                 }, 600);
             }, 200);
         });

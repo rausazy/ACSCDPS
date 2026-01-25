@@ -11,7 +11,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // ✅ EXPENSES
         $overallExpenses = Order::sum('overall_cost');
@@ -34,37 +34,49 @@ class HomeController extends Controller
             ->limit(3)
             ->get();
 
-        // ✅ MONTHLY ANALYTICS (last 12 months)
-        $start = Carbon::now()->startOfMonth()->subMonths(11);
-        $end   = Carbon::now()->endOfMonth();
+        // ✅ YEARS DROPDOWN (show even if walang order) — includes current year
+        $currentYear = now()->year;
+        $yearsBack = 5; // ilang years pababa (2026..2021 if current=2026)
+
+        $availableYears = range($currentYear, $currentYear - $yearsBack);
+
+        // default selected year = current year (2026)
+        $selectedYear = (int) $request->query('year', $currentYear);
+
+        // validate selection
+        if (!in_array($selectedYear, $availableYears, true)) {
+            $selectedYear = $availableYears[0]; // current year
+        }
+
+        // ✅ MONTHLY ANALYTICS (Jan–Dec of selected year)
+        $start = Carbon::create($selectedYear, 1, 1)->startOfMonth();
+        $end   = Carbon::create($selectedYear, 12, 31)->endOfMonth();
 
         $rows = Order::whereBetween('created_at', [$start, $end])
-            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym,
-                        SUM(total_price) as revenue,
-                        SUM(overall_cost) as expenses")
-            ->groupBy('ym')
-            ->orderBy('ym')
+            ->selectRaw("
+                MONTH(created_at) as m,
+                SUM(total_price) as revenue,
+                SUM(overall_cost) as expenses
+            ")
+            ->groupBy('m')
+            ->orderBy('m')
             ->get()
-            ->keyBy('ym');
+            ->keyBy('m');
 
         $chartLabels = [];
         $chartRevenue = [];
         $chartExpenses = [];
         $chartNet = [];
 
-        $cursor = $start->copy();
-        while ($cursor <= $end) {
-            $ym = $cursor->format('Y-m');
+        for ($m = 1; $m <= 12; $m++) {
+            $chartLabels[] = Carbon::create($selectedYear, $m, 1)->format('M');
 
-            $revenue = isset($rows[$ym]) ? (float) $rows[$ym]->revenue : 0;
-            $expenses = isset($rows[$ym]) ? (float) $rows[$ym]->expenses : 0;
+            $revenue = isset($rows[$m]) ? (float) $rows[$m]->revenue : 0;
+            $expenses = isset($rows[$m]) ? (float) $rows[$m]->expenses : 0;
 
-            $chartLabels[] = $cursor->format('M Y');
             $chartRevenue[] = $revenue;
             $chartExpenses[] = $expenses;
             $chartNet[] = $revenue - $expenses;
-
-            $cursor->addMonth();
         }
 
         return view('home', compact(
@@ -76,38 +88,51 @@ class HomeController extends Controller
             'chartLabels',
             'chartRevenue',
             'chartExpenses',
-            'chartNet'
+            'chartNet',
+            'availableYears',
+            'selectedYear'
         ));
     }
 
-    // ✅ PDF EXPORT (with chart image + table)
+    // ✅ PDF EXPORT (same selected year + chart image + table)
     public function exportAnalyticsPdf(Request $request)
     {
-        $start = Carbon::now()->startOfMonth()->subMonths(11);
-        $end   = Carbon::now()->endOfMonth();
+        $currentYear = now()->year;
+        $yearsBack = 5;
+
+        // ✅ accept year from form; default = current year
+        $selectedYear = (int) $request->input('year', $currentYear);
+
+        // ✅ validate year range
+        $availableYears = range($currentYear, $currentYear - $yearsBack);
+        if (!in_array($selectedYear, $availableYears, true)) {
+            $selectedYear = $availableYears[0]; // current year
+        }
+
+        $start = Carbon::create($selectedYear, 1, 1)->startOfMonth();
+        $end   = Carbon::create($selectedYear, 12, 31)->endOfMonth();
 
         $rows = Order::whereBetween('created_at', [$start, $end])
-            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym,
-                        SUM(total_price) as revenue,
-                        SUM(overall_cost) as expenses")
-            ->groupBy('ym')
-            ->orderBy('ym')
+            ->selectRaw("
+                MONTH(created_at) as m,
+                SUM(total_price) as revenue,
+                SUM(overall_cost) as expenses
+            ")
+            ->groupBy('m')
+            ->orderBy('m')
             ->get()
-            ->keyBy('ym');
+            ->keyBy('m');
 
         $data = [];
         $totalRevenue = 0;
         $totalExpenses = 0;
 
-        $cursor = $start->copy();
-        while ($cursor <= $end) {
-            $ym = $cursor->format('Y-m');
-
-            $revenue = isset($rows[$ym]) ? (float) $rows[$ym]->revenue : 0;
-            $expenses = isset($rows[$ym]) ? (float) $rows[$ym]->expenses : 0;
+        for ($m = 1; $m <= 12; $m++) {
+            $revenue = isset($rows[$m]) ? (float) $rows[$m]->revenue : 0;
+            $expenses = isset($rows[$m]) ? (float) $rows[$m]->expenses : 0;
 
             $data[] = [
-                'month' => $cursor->format('F Y'),
+                'month' => Carbon::create($selectedYear, $m, 1)->format('F Y'),
                 'revenue' => $revenue,
                 'expenses' => $expenses,
                 'net' => $revenue - $expenses,
@@ -115,11 +140,8 @@ class HomeController extends Controller
 
             $totalRevenue += $revenue;
             $totalExpenses += $expenses;
-
-            $cursor->addMonth();
         }
 
-        // base64 png from canvas
         $chartImage = $request->input('chart_image');
 
         $pdf = Pdf::loadView('monthly-analytics-pdf', [
@@ -128,8 +150,9 @@ class HomeController extends Controller
             'totalExpenses' => $totalExpenses,
             'totalNet' => $totalRevenue - $totalExpenses,
             'chartImage' => $chartImage,
+            'selectedYear' => $selectedYear,
         ])->setPaper('A4', 'portrait');
 
-        return $pdf->stream('Monthly_Analytics_Report.pdf');
+        return $pdf->stream("Monthly_Analytics_{$selectedYear}.pdf");
     }
 }
