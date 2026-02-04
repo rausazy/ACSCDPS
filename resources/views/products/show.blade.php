@@ -49,6 +49,7 @@
             </div>
         </div>
     </div>
+
     <div style="width:100%;max-width:80rem;padding:1.5rem;border-radius:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.1);background:#fff;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 auto;">
 
         <h2 style="font-size:1.5rem;font-weight:700;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
@@ -71,7 +72,7 @@
                 <button type="button" id="addRawBtn" 
                     style="margin-top:0.75rem;padding:0.5rem 1rem;color:#fff;border-radius:0.375rem;font-weight:500;background-color:rgb(139,92,246);cursor:pointer;transition:background-color .2s ease;display:inline-block;">
                     Add
-                </button>   
+                </button>   
             </div>
 
             <table class="responsive-table" style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;table-layout:fixed;">
@@ -158,6 +159,7 @@
     </div>
 </div>
 
+<!-- ✅ Success Modal -->
 <div id="confirmationModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
     <div style="background-color:#fefefe; margin:15% auto; padding:30px; border:1px solid #888; width:90%; max-width:500px; border-radius:0.75rem; text-align:center; box-shadow:0 8px 16px 0 rgba(0,0,0,0.2),0 12px 40px 0 rgba(0,0,0,0.19);">
         <h3 style="margin-bottom:1rem; color:#10b981; font-weight:700; font-size:1.5rem;">Order Confirmed! 🎉</h3>
@@ -168,8 +170,36 @@
         </button>
     </div>
 </div>
+
+<!-- ✅ Already Saved Modal (NEW) -->
+<div id="alreadySavedModal" style="display:none; position:fixed; z-index:1001; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);">
+    <div style="background-color:#ffffff; margin:15% auto; padding:28px; border:1px solid rgba(0,0,0,0.08); width:90%; max-width:520px; border-radius:1rem; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,0.18);">
+        
+        <div style="width:70px;height:70px;margin:0 auto 14px; border-radius:9999px; background:rgba(59,130,246,0.12); display:flex; align-items:center; justify-content:center;">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:34px;height:34px;color:#3b82f6;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 16v-4"></path>
+                <path d="M12 8h.01"></path>
+            </svg>
+        </div>
+
+        <h3 style="margin-bottom:0.5rem; color:#111827; font-weight:800; font-size:1.5rem; letter-spacing:-0.01em;">
+            Already saved
+        </h3>
+
+        <p style="margin:0 auto 1.25rem; max-width:420px; font-size:1.05rem; color:#4b5563; line-height:1.5;">
+            This order was already added to <b>Order History</b>.
+            If you want to add a new one, change the details then confirm again.
+        </p>
+
+        <button onclick="closeAlreadySavedModal()"
+            style="background-color:#3b82f6; color:white; font-weight:700; border-radius:0.6rem; padding:0.65rem 2.2rem; font-size:1rem; cursor:pointer; transition:transform .15s ease, opacity .2s ease;">
+            Okay
+        </button>
+    </div>
+</div>
+
 <style>
-/* ... (existing responsive table styles) ... */
 @media (max-width: 640px) {
     .responsive-table thead {display:none;}
     .responsive-table tr {display:block;margin-bottom:0.5rem;border:1px solid #e5e7eb;border-radius:0.5rem;padding:0.25rem;}
@@ -178,7 +208,6 @@
     .responsive-table td::before {content:attr(data-label);font-weight:600;color:#374151;margin-right:0.5rem;}
 }
 </style>
-
 
 <script>
 const costingBody = document.getElementById('costingBody');
@@ -193,9 +222,51 @@ const quoteDiscount = document.getElementById('quoteDiscount');
 const quoteCostPerPiece = document.getElementById('quoteCostPerPiece');
 const quoteSellingPrice = document.getElementById('quoteSellingPrice');
 const quoteTotal = document.getElementById('quoteTotal');
+
 const confirmationModal = document.getElementById('confirmationModal'); 
+const alreadySavedModal = document.getElementById('alreadySavedModal');
 
 let currentQuoteTotal = 0;
+
+// ✅ guards (anti double-submit)
+let isSubmittingOrder = false;
+let lastOrderFingerprint = null;
+
+function fingerprintOrder(orderData) {
+    return JSON.stringify({
+        customer: {
+            name: orderData.customer?.name?.trim() || "",
+            email: orderData.customer?.email?.trim() || "",
+            phone: orderData.customer?.phone?.trim() || "",
+            address: orderData.customer?.address?.trim() || "",
+        },
+        quotation: {
+            product_name: orderData.quotation?.product_name || "",
+            quantity: orderData.quotation?.quantity || 0,
+            cost_per_piece: orderData.quotation?.cost_per_piece || 0,
+            markup: orderData.quotation?.markup || 0,
+            selling_price_per_piece: orderData.quotation?.selling_price_per_piece || 0,
+            discount_percentage: orderData.quotation?.discount_percentage || 0,
+            total_price: orderData.quotation?.total_price || 0,
+        },
+        costing: {
+            overall_cost: orderData.costing?.overall_cost || 0,
+            raw_materials: (orderData.costing?.raw_materials || []).map(r => ({
+                id: r.id,
+                quantity: r.quantity,
+                unit_price: r.unit_price,
+                total_price: r.total_price
+            }))
+        }
+    });
+}
+
+function openAlreadySavedModal() {
+    if (alreadySavedModal) alreadySavedModal.style.display = 'block';
+}
+function closeAlreadySavedModal() {
+    if (alreadySavedModal) alreadySavedModal.style.display = 'none';
+}
 
 function updateTotals() {
     let overallTotal = 0;
@@ -335,12 +406,19 @@ function closeModal() {
     confirmationModal.style.display = 'none';
 }
 
+// ✅ confirmOrder with modal (no toaster/alert)
 function confirmOrder() {
+    // block second click while saving
+    if (isSubmittingOrder) {
+        openAlreadySavedModal();
+        return;
+    }
+
     updateQuotation();
 
     const rawMaterials = getRawMaterialData();
 
-    // ✅ VALIDATIONS (para di ka mag-send ng 0 / blank)
+    // ✅ VALIDATIONS
     if (!document.getElementById('customerName').value.trim() ||
         !document.getElementById('customerEmail').value.trim() ||
         !document.getElementById('customerPhone').value.trim()) {
@@ -351,22 +429,10 @@ function confirmOrder() {
     const q = parseFloat(document.getElementById('quoteQty').value) || 0;
     const total = parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0;
 
-    if (q <= 0) {
-        alert('Please set Quantity to at least 1.');
-        return;
-    }
+    if (q <= 0) { alert('Please set Quantity to at least 1.'); return; }
+    if (rawMaterials.length === 0) { alert('Please add raw materials before confirming the order.'); return; }
+    if (total <= 0) { alert('Please set a valid quotation (total price must be > 0).'); return; }
 
-    if (rawMaterials.length === 0) {
-        alert('Please add raw materials before confirming the order.');
-        return;
-    }
-
-    if (total <= 0) {
-        alert('Please set a valid quotation (total price must be > 0).');
-        return;
-    }
-
-    // ✅ build payload
     const orderData = {
         customer: {
             name: document.getElementById('customerName').value,
@@ -389,9 +455,25 @@ function confirmOrder() {
         }
     };
 
-    // ✅ disable button while sending (avoid double click)
+    // block if same exact order already sent
+    const fp = fingerprintOrder(orderData);
+    if (lastOrderFingerprint && lastOrderFingerprint === fp) {
+        openAlreadySavedModal();
+        return;
+    }
+
+    // ✅ lock NOW (before fetch)
+    isSubmittingOrder = true;
+    lastOrderFingerprint = fp;
+
+    // ✅ disable button immediately
     const btn = document.getElementById('confirmOrderBtn');
-    if (btn) btn.disabled = true;
+    if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = "0.8";
+        btn.style.cursor = "not-allowed";
+        btn.innerText = "Saving...";
+    }
 
     fetch("{{ route('history.store') }}", {
         method: "POST",
@@ -410,6 +492,11 @@ function confirmOrder() {
         if (!res.ok) {
             console.error("STATUS:", res.status);
             console.error("RESPONSE:", text);
+
+            // allow retry on failure
+            isSubmittingOrder = false;
+            lastOrderFingerprint = null;
+
             alert(payload.message || `Failed to save order (${res.status}). Check console.`);
             return;
         }
@@ -419,34 +506,35 @@ function confirmOrder() {
     })
     .catch(err => {
         console.error("Error saving order:", err);
+
+        // allow retry on failure
+        isSubmittingOrder = false;
+        lastOrderFingerprint = null;
+
         alert("Network/JS error. Check console.");
     })
     .finally(() => {
-        if (btn) btn.disabled = false;
+        // keep isSubmittingOrder = true on success (so 2nd click shows Already Saved modal)
+        if (btn) {
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btn.style.cursor = "pointer";
+            btn.innerText = "Confirm Order";
+        }
     });
 }
 
 function preparePdfData(event) {
     if (event) event.preventDefault();
 
-    // make sure computed values updated
     updateQuotation();
 
     const qty = parseFloat(document.getElementById('quoteQty').value) || 0;
     const total = parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0;
 
-    // ✅ BLOCK EXPORT kapag walang laman / zero
-    if (qty <= 0) {
-        alert('Please set Quantity to at least 1 before exporting.');
-        return;
-    }
+    if (qty <= 0) { alert('Please set Quantity to at least 1 before exporting.'); return; }
+    if (total <= 0) { alert('Total price must be greater than 0 before exporting.'); return; }
 
-    if (total <= 0) {
-        alert('Total price must be greater than 0 before exporting.');
-        return;
-    }
-
-    // Optional: require customer name/email/phone bago export
     const name = document.getElementById('customerName').value.trim();
     const email = document.getElementById('customerEmail').value.trim();
     const phone = document.getElementById('customerPhone').value.trim();
@@ -456,7 +544,6 @@ function preparePdfData(event) {
         return;
     }
 
-    // ✅ build payload
     const data = {
         product: "{{ $product->name }}",
         quantity: qty,
@@ -476,9 +563,8 @@ function preparePdfData(event) {
 }
 
 window.onclick = function(event) {
-    if (event.target == confirmationModal) {
-        closeModal();
-    }
+    if (event.target == confirmationModal) closeModal();
+    if (alreadySavedModal && event.target == alreadySavedModal) closeAlreadySavedModal();
 }
 </script>
 
