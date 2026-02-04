@@ -75,19 +75,18 @@
                 </button>   
             </div>
 
-            <table class="responsive-table" style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;table-layout:fixed;">
-                <thead>
-                    <tr style="background-color:#f3f4f6;">
-                        <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Raw Material</th>
-                        <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Quantity</th>
-                        <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Unit Price</th>
-                        <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Total Price</th>
-                        <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="costingBody"></tbody>
-            </table>
-
+<table class="responsive-table" style="width:100%; border-collapse:collapse; border:1px solid #e5e7eb; table-layout:fixed;">
+            <thead>
+                <tr style="background-color:#f3f4f6; color:#374151;">
+                    <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Raw Material</th>
+                    <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Quantity</th>
+                    <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Unit Price</th>
+                    <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Total Price</th>
+                    <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="costingBody"></tbody>
+        </table>
             <div style="margin-top:1.5rem;text-align:right;">
                 <h3 style="font-size:1.125rem;font-weight:700;color:#1f2937;margin:0;">Overall Cost: <span id="overallCost">₱0.00</span></h3>
                 <h3 style="font-size:1.125rem;font-weight:700;color:#1f2937;margin:0;">Overall Revenue: <span id="overallRevenue">₱0.00</span></h3>
@@ -116,39 +115,39 @@
             </form>
         </h2>
 
-        <table class="responsive-table" style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;table-layout:fixed;">
-            <thead>
-                <tr style="background-color:#f3f4f6;">
-                    <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Product</th>
-                    <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Quantity</th>
-                    <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Cost per Piece</th>
-                    <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Markup per Piece (₱)</th>
-                    <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Selling Price per Piece</th>
-                    <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Discount (%)</th>
-                    <th style="border:1px solid #e5e7eb;padding:0.5rem 1rem;text-align:left;">Total Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr id="quotationRow">
-                    <td style="border:1px solid #e5e7eb;padding:0.5rem 1rem;font-weight:500;word-wrap:break-word;overflow-wrap:break-word;" data-label="Product">{{ $product->name }}</td>
-                    <td style="border:1px solid #e5e7eb;padding:0.5rem 1rem;" data-label="Quantity">
-                        <input type="number" id="quoteQty" min="1" value="0"
-                            style="width:70px;padding:0.25rem 0.5rem;border:1px solid #d1d5db;border-radius:0.375rem;">
-                    </td>
-                    <td id="quoteCostPerPiece" style="border:1px solid #e5e7eb;padding:0.5rem 1rem;" data-label="Cost per Piece">₱0.00</td>
-                    <td style="border:1px solid #e5e7eb;padding:0.5rem 1rem;" data-label="Markup per Piece">
-                        <input type="number" id="quoteMarkup" step="0.01" value="0"
-                            style="width:70px;padding:0.25rem 0.5rem;border:1px solid #d1d5db;border-radius:0.375rem;">
-                    </td>
-                    <td id="quoteSellingPrice" style="border:1px solid #e5e7eb;padding:0.5rem 1rem;" data-label="Selling Price">₱0.00</td>
-                    <td style="border:1px solid #e5e7eb;padding:0.5rem 1rem;" data-label="Discount">
-                        <input type="number" id="quoteDiscount" step="0.01" value="0"
-                            style="width:70px;padding:0.25rem 0.5rem;border:1px solid #d1d5db;border-radius:0.375rem;">
-                    </td>
-                    <td id="quoteTotal" style="border:1px solid #e5e7eb;padding:0.5rem 1rem;" data-label="Total">₱0.00</td>
-                </tr>
-            </tbody>
-        </table>
+        <table class="responsive-table" style="width:100%; border-collapse:collapse; border:1px solid #e5e7eb; table-layout:fixed;">
+        <thead>
+            <tr style="background-color:#f3f4f6; color:#374151;">
+                <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Service</th>
+                <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Quantity</th>
+                <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Cost per Unit</th>
+                <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Markup (₱)</th>
+                <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Selling Price</th>
+                <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Discount (%)</th>
+                <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:600;">Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="quotationRow" style="background-color: #fff;">
+                <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem; font-weight:500; word-wrap:break-word; overflow-wrap:break-word;" data-label="Product">{{ $product->name }}</td>
+                <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Quantity">
+                    <input type="number" id="quoteQty" min="1" value="0"
+                        style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none; text-align: center;">
+                </td>
+                <td id="quoteCostPerPiece" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; color:#000000; font-weight:500;" data-label="Cost per Unit">₱0.00</td>
+                <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Markup per Unit">
+                    <input type="number" id="quoteMarkup" step="0.01" value="0"
+                        style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none; text-align: center;">
+                </td>
+                <td id="quoteSellingPrice" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; color:#000000; font-weight:700;" data-label="Selling Price">₱0.00</td>
+                <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Discount">
+                    <input type="number" id="quoteDiscount" step="0.01" value="0"
+                        style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none; text-align: center;">
+                </td>
+                <td id="quoteTotal" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; font-weight:700; color:#1f2937;" data-label="Total">₱0.00</td>
+            </tr>
+        </tbody>
+    </table>
 
         <div style="margin-top:1.5rem;text-align:center;">
             <button type="button" id="confirmOrderBtn" onclick="confirmOrder()"

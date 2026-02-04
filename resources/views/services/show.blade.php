@@ -61,24 +61,24 @@
         Costing
     </h2>
 
-    @if($rawMaterials->count())
-        <div style="margin-bottom:1.5rem; border:1px solid #e5e7eb; padding:1rem; border-radius:0.5rem; background-color: #f9fafb;">
-            <label style="display:block; font-weight:500; color:#374151; margin-bottom:0.5rem;">Select Raw Materials to Use</label>
-            <div style="display:flex; gap:0.5rem; flex-wrap: wrap; align-items: flex-end;">
-                <select id="rawSelect" style="flex-grow:1; min-width: 200px; border:1px solid #d1d5db; border-radius:0.375rem; padding:0.5rem 0.75rem; outline:none;">
+     @if($rawMaterials->count())
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-weight:500;color:#374151;margin-bottom:0.5rem;">Select Raw Materials to Use</label>
+                <select id="rawSelect" style="width:100%;border:1px solid #d1d5db;border-radius:0.375rem;padding:0.5rem 0.75rem;">
                     <option value="">-- Choose Raw Material --</option>
                     @foreach($rawMaterials as $raw)
-                        <option value="{{ $raw->id }}" data-name="{{ $raw->name }}" data-price="{{ $raw->price }}">
-                            {{ $raw->name }} 
+                        <option value="{{ $raw->id }}" 
+                                data-name="{{ $raw->name }}" 
+                                data-price="{{ $raw->price }}">
+                            {{ $raw->name }}
                         </option>
                     @endforeach
                 </select>
                 <button type="button" id="addRawBtn" 
-                    style="padding:0.5rem 1rem; color:#fff; border-radius:0.375rem; font-weight:500; background-color:#9333ea; cursor:pointer; transition:background-color .2s ease; border:none; flex-shrink: 0;">
+                    style="margin-top:0.75rem;padding:0.5rem 1rem;color:#fff;border-radius:0.375rem;font-weight:500;background-color:rgb(139,92,246);cursor:pointer;transition:background-color .2s ease;display:inline-block;">
                     Add
-                </button> 
+                </button>   
             </div>
-        </div>
 
         <table class="responsive-table" style="width:100%; border-collapse:collapse; border:1px solid #e5e7eb; table-layout:fixed;">
             <thead>
