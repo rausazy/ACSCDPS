@@ -124,10 +124,9 @@
                 
                 <!-- inner white box -->
                 <div class="relative bg-white rounded-2xl shadow-md p-4 sm:p-6 flex flex-col items-center text-center transition duration-300">
-                    <x-dynamic-component 
-                        :component="'heroicon-o-' . $service->icon"
-                        class="w-10 h-10 sm:w-12 sm:h-12 stroke-current {{ $service->color }} mb-3
-                               transition-transform duration-300 group-hover:scale-105" />
+                    <x-dynamic-component :component="'heroicon-o-' . $service->icon"
+                    class="w-10 h-10 sm:w-12 sm:h-12 text-black mb-3
+                        transition-transform duration-300 group-hover:scale-105" />
                     
                     <h2 class="text-base sm:text-lg font-semibold text-gray-800">
                         {{ $service->name }}

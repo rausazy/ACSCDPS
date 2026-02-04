@@ -1,6 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
+
+{{-- ✅ FORCE ALL ICONS TO BLACK (stocks page) --}}
+<style>
+    /* heroicons are SVG, force stroke + color to black */
+    svg,
+    svg * {
+        color: #000 !important;
+        stroke: #000 !important;
+    }
+</style>
+
 <div style="min-height:100vh; padding:4rem 1rem;">
 
     <!-- Page Container -->
