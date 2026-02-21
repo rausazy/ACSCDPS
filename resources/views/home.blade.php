@@ -62,7 +62,6 @@
 
     </div>
 
-    <!-- ✅ Low Stocks + Best Sellers + Restock Board -->
     <div class="w-full max-w-6xl mb-16">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
@@ -102,89 +101,150 @@
 
         </div>
 
-        <!-- ✅ ONE CARD: Restock Board (4 Columns, colored headers, smooth transitions) -->
-        <div class="mt-8 bg-white rounded-2xl shadow-lg p-8">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">🧾 Restock Board</h2>
-                <p class="text-sm text-gray-500">
-                    Update status using the dropdown — items will move smoothly.
-                </p>
+        <!-- ✅ RESTOCK BOARD (Hosted-safe layout + roomy spacing + drop animation) -->
+        <div style="
+            margin-top:48px;
+            margin-bottom:10px;
+            background:#ffffff;
+            border-radius:24px;
+            padding:40px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.08);
+        ">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="font-size:22px;">🧾</div>
+                    <div>
+                        <div style="font-size:22px; font-weight:800; color:#111827; line-height:1.2;">Restock Board</div>
+                    </div>
+                </div>
             </div>
 
             @if($lowStocks->count())
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div style="overflow-x:auto; margin-top:24px;">
+                    <div style="min-width: 980px;">
+                        <div style="
+                            display:grid;
+                            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+                            gap:28px;
+                        ">
 
-                    <!-- Products -->
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="font-bold text-sm text-gray-700">Products</h3>
-                            <span id="count-products"
-                                class="text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 text-gray-700">0</span>
+                            <!-- Products -->
+                            <div>
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                                    <div style="font-weight:800; font-size:13px; color:#111827;">Products</div>
+                                    <span id="count-products"
+                                        style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; background:#f3f4f6; color:#374151;">0</span>
+                                </div>
+                                <div id="rb-product-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+                            </div>
+
+                            <!-- To Buy -->
+                            <div>
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                                    <div style="font-weight:800; font-size:13px; color:#92400e;">To Buy</div>
+                                    <span id="count-to_buy"
+                                        style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; background:#fef3c7; color:#92400e;">0</span>
+                                </div>
+                                <div id="col-to_buy"
+                                     style="
+                                        min-height:300px;
+                                        background:#fffbeb;
+                                        border:2px solid #fde68a;
+                                        border-radius:20px;
+                                        padding:20px;
+                                        display:flex;
+                                        flex-direction:column;
+                                        gap:14px;
+                                     ">
+                                </div>
+                            </div>
+
+                            <!-- On Going -->
+                            <div>
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                                    <div style="font-weight:800; font-size:13px; color:#075985;">On Going</div>
+                                    <span id="count-on_going"
+                                        style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; background:#e0f2fe; color:#075985;">0</span>
+                                </div>
+                                <div id="col-on_going"
+                                     style="
+                                        min-height:300px;
+                                        background:#f0f9ff;
+                                        border:2px solid #bae6fd;
+                                        border-radius:20px;
+                                        padding:20px;
+                                        display:flex;
+                                        flex-direction:column;
+                                        gap:14px;
+                                     ">
+                                </div>
+                            </div>
+
+                            <!-- Done -->
+                            <div>
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                                    <div style="font-weight:800; font-size:13px; color:#065f46;">Done</div>
+                                    <span id="count-done"
+                                        style="font-size:12px; font-weight:800; padding:4px 10px; border-radius:999px; background:#d1fae5; color:#065f46;">0</span>
+                                </div>
+                                <div id="col-done"
+                                     style="
+                                        min-height:300px;
+                                        background:#ecfdf5;
+                                        border:2px solid #a7f3d0;
+                                        border-radius:20px;
+                                        padding:20px;
+                                        display:flex;
+                                        flex-direction:column;
+                                        gap:14px;
+                                     ">
+                                </div>
+                            </div>
+
                         </div>
-                        <div id="rb-product-list" class="space-y-3"></div>
                     </div>
-
-                    <!-- To Buy -->
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="font-bold text-sm text-amber-900">To Buy</h3>
-                            <span id="count-to_buy"
-                                class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-900">0</span>
-                        </div>
-                        <div id="col-to_buy" class="min-h-[230px] rounded-xl p-3 space-y-2 border bg-amber-50"></div>
-                    </div>
-
-                    <!-- On Going -->
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="font-bold text-sm text-sky-900">On Going</h3>
-                            <span id="count-on_going"
-                                class="text-xs font-semibold px-2 py-1 rounded-full bg-sky-100 text-sky-900">0</span>
-                        </div>
-                        <div id="col-on_going" class="min-h-[230px] rounded-xl p-3 space-y-2 border bg-sky-50"></div>
-                    </div>
-
-                    <!-- Done -->
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="font-bold text-sm text-emerald-900">Done</h3>
-                            <span id="count-done"
-                                class="text-xs font-semibold px-2 py-1 rounded-full bg-emerald-100 text-emerald-900">0</span>
-                        </div>
-                        <div id="col-done" class="min-h-[230px] rounded-xl p-3 space-y-2 border bg-emerald-50"></div>
-                    </div>
-
                 </div>
 
-                <!-- tiny helper style for smooth animation -->
+                <!-- Drop animation + card styling -->
                 <style>
-                    .rb-card {
-                        transition: transform 250ms ease, opacity 250ms ease, box-shadow 250ms ease;
+                    .rb-card{
+                        background:#fff;
+                        border:1px solid #e5e7eb;
+                        border-radius:16px;
+                        padding:14px 16px;
+                        box-shadow:0 4px 14px rgba(0,0,0,0.06);
+                        transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
                     }
-                    .rb-card.rb-enter {
-                        opacity: 0;
-                        transform: translateY(6px);
+                    .rb-card:hover{
+                        transform: translateY(-2px);
+                        box-shadow:0 8px 18px rgba(0,0,0,0.09);
                     }
-                    .rb-card.rb-enter-active {
-                        opacity: 1;
-                        transform: translateY(0);
+
+                    .rb-badge{
+                        background:#fff;
+                        border-radius:16px;
+                        padding:14px 16px;
+                        box-shadow:0 4px 14px rgba(0,0,0,0.06);
+                        transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
                     }
-                    .rb-badge {
-                        transition: transform 250ms ease, opacity 250ms ease, box-shadow 250ms ease;
+
+                    @keyframes rbDrop {
+                        0%   { opacity: 0; transform: translateY(-10px) scale(0.98); }
+                        70%  { opacity: 1; transform: translateY(2px) scale(1.01); }
+                        100% { opacity: 1; transform: translateY(0) scale(1); }
                     }
-                    .rb-badge.rb-pop {
-                        transform: scale(0.97);
-                        opacity: 0.2;
+                    .rb-drop{
+                        animation: rbDrop 260ms ease-out;
                     }
                 </style>
             @else
-                <p class="text-gray-500 italic">No low stock items to track.</p>
+                <p style="color:#6b7280; font-style:italic; margin-top:12px;">No low stock items to track.</p>
             @endif
         </div>
     </div>
 
-    <!-- Monthly Analytics -->
-    <div class="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-8">
+    <!-- ✅ Monthly Analytics (with more spacing from Restock Board) -->
+    <div class="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-8" sstyle="margin-top:32px;">
 
         <!-- ✅ Row 1: Title + Dropdown -->
         <div class="flex flex-col sm:flex-row sm:items-center gap-5 mb-2 w-full">   
@@ -236,53 +296,87 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    (function () {
-        // =========================
-        // Chart Vars
-        // =========================
-        const labels = @json($chartLabels ?? []);
-        const revenue = @json($chartRevenue ?? []);
-        const expenses = @json($chartExpenses ?? []);
-        const net = @json($chartNet ?? []);
+(function () {
+    // =========================
+    // Chart Vars
+    // =========================
+    const labels = @json($chartLabels ?? []);
+    const revenue = @json($chartRevenue ?? []);
+    const expenses = @json($chartExpenses ?? []);
+    const net = @json($chartNet ?? []);
 
-        const exportForm = document.getElementById('exportPdfForm');
-        const exportBtn = document.getElementById('exportPdfBtn');
-        const chartImageInput = document.getElementById('chartImageInput');
+    const exportForm = document.getElementById('exportPdfForm');
+    const exportBtn = document.getElementById('exportPdfBtn');
+    const chartImageInput = document.getElementById('chartImageInput');
 
-        const yearSelect = document.getElementById('yearSelect');
-        const yearInput = document.getElementById('yearInput');
+    const yearSelect = document.getElementById('yearSelect');
+    const yearInput = document.getElementById('yearInput');
 
-        if (yearSelect) {
-            yearSelect.addEventListener('change', function () {
-                const yr = this.value;
-                if (yearInput) yearInput.value = yr;
+    if (yearSelect) {
+        yearSelect.addEventListener('change', function () {
+            const yr = this.value;
+            if (yearInput) yearInput.value = yr;
 
-                const url = new URL(window.location.href);
-                url.searchParams.set('year', yr);
-                window.location.href = url.toString();
-            });
+            const url = new URL(window.location.href);
+            url.searchParams.set('year', yr);
+            window.location.href = url.toString();
+        });
+    }
+
+    if (yearSelect && yearInput) yearInput.value = yearSelect.value;
+
+    const uiCanvas = document.getElementById('monthlyChart');
+    new Chart(uiCanvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Revenue', data: revenue, tension: 0.35, fill: false },
+                { label: 'Expenses', data: expenses, tension: 0.35, fill: false },
+                { label: 'Net Income', data: net, tension: 0.35, fill: false },
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: true } },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return '₱' + Number(value).toLocaleString();
+                        }
+                    }
+                }
+            }
         }
+    });
 
-        if (yearSelect && yearInput) yearInput.value = yearSelect.value;
+    function buildPdfChart() {
+        const pdfCanvas = document.getElementById('monthlyChartPdf');
+        pdfCanvas.width = 1100;
+        pdfCanvas.height = 520;
 
-        const uiCanvas = document.getElementById('monthlyChart');
-        new Chart(uiCanvas, {
-            type: 'line',
+        const pdfCtx = pdfCanvas.getContext('2d');
+
+        return new Chart(pdfCtx, {
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Revenue', data: revenue, tension: 0.35, fill: false },
-                    { label: 'Expenses', data: expenses, tension: 0.35, fill: false },
-                    { label: 'Net Income', data: net, tension: 0.35, fill: false },
+                    { label: 'Revenue', data: revenue },
+                    { label: 'Expenses', data: expenses },
+                    { label: 'Net Income', data: net },
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
+                responsive: false,
+                animation: false,
                 plugins: { legend: { display: true } },
                 scales: {
                     y: {
+                        beginAtZero: true,
                         ticks: {
                             callback: function(value) {
                                 return '₱' + Number(value).toLocaleString();
@@ -292,218 +386,160 @@
                 }
             }
         });
+    }
 
-        function buildPdfChart() {
-            const pdfCanvas = document.getElementById('monthlyChartPdf');
-            pdfCanvas.width = 1100;
-            pdfCanvas.height = 520;
+    exportBtn.addEventListener('click', function () {
+        exportBtn.disabled = true;
+        exportBtn.style.opacity = "0.7";
+        exportBtn.style.cursor = "not-allowed";
 
-            const pdfCtx = pdfCanvas.getContext('2d');
+        if (yearSelect && yearInput) yearInput.value = yearSelect.value;
 
-            return new Chart(pdfCtx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Revenue', data: revenue },
-                        { label: 'Expenses', data: expenses },
-                        { label: 'Net Income', data: net },
-                    ]
-                },
-                options: {
-                    responsive: false,
-                    animation: false,
-                    plugins: { legend: { display: true } },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '₱' + Number(value).toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+        if (typeof Chart === 'undefined') {
+            chartImageInput.value = '';
+            exportForm.submit();
+            return;
         }
 
-        exportBtn.addEventListener('click', function () {
-            exportBtn.disabled = true;
-            exportBtn.style.opacity = "0.7";
-            exportBtn.style.cursor = "not-allowed";
+        const pdfChart = buildPdfChart();
 
-            if (yearSelect && yearInput) yearInput.value = yearSelect.value;
-
-            if (typeof Chart === 'undefined') {
+        setTimeout(() => {
+            try {
+                const pdfCanvas = document.getElementById('monthlyChartPdf');
+                chartImageInput.value = pdfCanvas.toDataURL('image/png');
+            } catch (err) {
                 chartImageInput.value = '';
-                exportForm.submit();
-                return;
             }
 
-            const pdfChart = buildPdfChart();
+            pdfChart.destroy();
+            exportForm.submit();
 
             setTimeout(() => {
-                try {
-                    const pdfCanvas = document.getElementById('monthlyChartPdf');
-                    chartImageInput.value = pdfCanvas.toDataURL('image/png');
-                } catch (err) {
-                    chartImageInput.value = '';
-                }
+                exportBtn.disabled = false;
+                exportBtn.style.opacity = "1";
+                exportBtn.style.cursor = "pointer";
+            }, 600);
+        }, 200);
+    });
 
-                pdfChart.destroy();
-                exportForm.submit();
+    // =========================
+    // ✅ Restock Board (localStorage + drop animation)
+    // =========================
+    document.addEventListener("DOMContentLoaded", function() {
+        const productList = document.getElementById("rb-product-list");
+        const colToBuy = document.getElementById("col-to_buy");
+        const colOnGoing = document.getElementById("col-on_going");
+        const colDone = document.getElementById("col-done");
 
-                setTimeout(() => {
-                    exportBtn.disabled = false;
-                    exportBtn.style.opacity = "1";
-                    exportBtn.style.cursor = "pointer";
-                }, 600);
-            }, 200);
-        });
+        const countProducts = document.getElementById("count-products");
+        const countToBuy = document.getElementById("count-to_buy");
+        const countOnGoing = document.getElementById("count-on_going");
+        const countDone = document.getElementById("count-done");
 
-        // =========================
-        // ✅ Restock Board (no qty left, colored, smooth transitions)
-        // =========================
-        document.addEventListener("DOMContentLoaded", function() {
-            const productList = document.getElementById("rb-product-list");
-            const colToBuy = document.getElementById("col-to_buy");
-            const colOnGoing = document.getElementById("col-on_going");
-            const colDone = document.getElementById("col-done");
+        if (!productList || !colToBuy || !colOnGoing || !colDone) return;
 
-            const countProducts = document.getElementById("count-products");
-            const countToBuy = document.getElementById("count-to_buy");
-            const countOnGoing = document.getElementById("count-on_going");
-            const countDone = document.getElementById("count-done");
+        const items = @json($lowStocks->map(function($i){
+            return ['id'=>$i->id,'name'=>$i->name];
+        })->values());
 
-            if (!productList || !colToBuy || !colOnGoing || !colDone) return;
+        const key = "restock_board_pretty_v2";
+        let statuses = {};
+        try { statuses = JSON.parse(localStorage.getItem(key) || "{}"); } catch(e){ statuses = {}; }
 
-            const items = @json($lowStocks->map(function($i){
-                return ['id'=>$i->id,'name'=>$i->name];
-            })->values());
+        function save() {
+            localStorage.setItem(key, JSON.stringify(statuses));
+        }
 
-            const key = "restock_board_pretty_v1";
-            let statuses = {};
-            try { statuses = JSON.parse(localStorage.getItem(key) || "{}"); } catch(e){ statuses = {}; }
+        function createBadge(item, borderColor) {
+            const div = document.createElement("div");
+            div.className = "rb-badge rb-drop";
+            div.style.border = "1px solid " + borderColor;
+            div.innerHTML = `<div style="font-weight:800; color:#111827; font-size:13px;">${item.name}</div>`;
+            // remove class after animation so it can animate again next time
+            setTimeout(() => div.classList.remove('rb-drop'), 300);
+            return div;
+        }
 
-            function save() {
-                localStorage.setItem(key, JSON.stringify(statuses));
-            }
+        function renderColumns() {
+            colToBuy.innerHTML = "";
+            colOnGoing.innerHTML = "";
+            colDone.innerHTML = "";
 
-            function animateIn(el) {
-                el.classList.add('rb-enter');
-                requestAnimationFrame(() => {
-                    el.classList.add('rb-enter-active');
-                    setTimeout(() => {
-                        el.classList.remove('rb-enter');
-                        el.classList.remove('rb-enter-active');
-                    }, 260);
-                });
-            }
+            let cToBuy = 0, cOnGoing = 0, cDone = 0;
 
-            function createBadge(item, tint) {
-                const div = document.createElement("div");
-                div.className = "rb-badge bg-white border rounded-xl p-3 text-sm shadow-sm";
-                div.style.borderColor = tint.border;
-                div.style.boxShadow = "0 3px 12px rgba(0,0,0,0.06)";
-                div.innerHTML = `
-                    <div class="font-semibold text-gray-800">${item.name}</div>
-                `;
-                return div;
-            }
-
-            function renderColumns(withPop = false) {
-                colToBuy.innerHTML = "";
-                colOnGoing.innerHTML = "";
-                colDone.innerHTML = "";
-
-                let cToBuy = 0, cOnGoing = 0, cDone = 0;
-
-                items.forEach(item => {
-                    const status = statuses[item.id] || "to_buy";
-
-                    if (status === "to_buy") {
-                        const badge = createBadge(item, { border: "#fbbf24" });
-                        colToBuy.appendChild(badge);
-                        if (withPop) badge.classList.add('rb-pop');
-                        setTimeout(()=> badge.classList.remove('rb-pop'), 220);
-                        cToBuy++;
-                    }
-
-                    if (status === "on_going") {
-                        const badge = createBadge(item, { border: "#38bdf8" });
-                        colOnGoing.appendChild(badge);
-                        if (withPop) badge.classList.add('rb-pop');
-                        setTimeout(()=> badge.classList.remove('rb-pop'), 220);
-                        cOnGoing++;
-                    }
-
-                    if (status === "done") {
-                        const badge = createBadge(item, { border: "#34d399" });
-                        colDone.appendChild(badge);
-                        if (withPop) badge.classList.add('rb-pop');
-                        setTimeout(()=> badge.classList.remove('rb-pop'), 220);
-                        cDone++;
-                    }
-                });
-
-                // Empty text
-                if (!colToBuy.children.length) colToBuy.innerHTML = `<p class="text-xs text-amber-700/70 italic">No items</p>`;
-                if (!colOnGoing.children.length) colOnGoing.innerHTML = `<p class="text-xs text-sky-700/70 italic">No items</p>`;
-                if (!colDone.children.length) colDone.innerHTML = `<p class="text-xs text-emerald-700/70 italic">No items</p>`;
-
-                // Counts
-                if (countProducts) countProducts.textContent = items.length;
-                if (countToBuy) countToBuy.textContent = cToBuy;
-                if (countOnGoing) countOnGoing.textContent = cOnGoing;
-                if (countDone) countDone.textContent = cDone;
-            }
-
-            // Build product list
-            productList.innerHTML = "";
             items.forEach(item => {
-                const wrapper = document.createElement("div");
-                wrapper.className = "rb-card bg-white border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md";
-                wrapper.innerHTML = `
-                    <div class="flex justify-between items-center gap-3">
-                        <div class="min-w-0">
-                            <div class="font-bold text-sm text-gray-800 truncate">${item.name}</div>
-                        </div>
+                const status = statuses[item.id] || "to_buy";
 
-                        <select class="border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                data-id="${item.id}">
-                            <option value="to_buy">To Buy</option>
-                            <option value="on_going">On Going</option>
-                            <option value="done">Done</option>
-                        </select>
-                    </div>
-                `;
-
-                const sel = wrapper.querySelector("select");
-                sel.value = statuses[item.id] || "to_buy";
-
-                sel.addEventListener("change", function() {
-                    statuses[item.id] = this.value;
-                    save();
-
-                    // quick soft animation
-                    wrapper.style.opacity = "0.6";
-                    wrapper.style.transform = "translateY(1px)";
-                    setTimeout(() => {
-                        wrapper.style.opacity = "1";
-                        wrapper.style.transform = "translateY(0)";
-                    }, 180);
-
-                    renderColumns(true);
-                });
-
-                productList.appendChild(wrapper);
-                animateIn(wrapper);
+                if (status === "to_buy") {
+                    colToBuy.appendChild(createBadge(item, "#fbbf24"));
+                    cToBuy++;
+                } else if (status === "on_going") {
+                    colOnGoing.appendChild(createBadge(item, "#38bdf8"));
+                    cOnGoing++;
+                } else {
+                    colDone.appendChild(createBadge(item, "#34d399"));
+                    cDone++;
+                }
             });
 
-            renderColumns(false);
+            if (!colToBuy.children.length) colToBuy.innerHTML = `<div style="color:#92400e; opacity:.7; font-size:12px; font-style:italic;">No items</div>`;
+            if (!colOnGoing.children.length) colOnGoing.innerHTML = `<div style="color:#075985; opacity:.7; font-size:12px; font-style:italic;">No items</div>`;
+            if (!colDone.children.length) colDone.innerHTML = `<div style="color:#065f46; opacity:.7; font-size:12px; font-style:italic;">No items</div>`;
+
+            if (countProducts) countProducts.textContent = items.length;
+            if (countToBuy) countToBuy.textContent = cToBuy;
+            if (countOnGoing) countOnGoing.textContent = cOnGoing;
+            if (countDone) countDone.textContent = cDone;
+        }
+
+        // Build product list with dropdowns
+        productList.innerHTML = "";
+        items.forEach(item => {
+            const wrapper = document.createElement("div");
+            wrapper.className = "rb-card";
+
+            wrapper.innerHTML = `
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div style="min-width:0;">
+                        <div style="font-weight:800; color:#111827; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                            ${item.name}
+                        </div>
+                    </div>
+
+                    <select class="rb-select"
+                        style="
+                            border:2px solid #a855f7;
+                            border-radius:14px;
+                            padding:8px 12px;
+                            font-size:12px;
+                            font-weight:700;
+                            outline:none;
+                            cursor:pointer;
+                            background:#fff;
+                        "
+                        data-id="${item.id}">
+                        <option value="to_buy">To Buy</option>
+                        <option value="on_going">On Going</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+            `;
+
+            const sel = wrapper.querySelector("select");
+            sel.value = statuses[item.id] || "to_buy";
+
+            sel.addEventListener("change", function() {
+                statuses[item.id] = this.value;
+                save();
+                renderColumns();
+            });
+
+            productList.appendChild(wrapper);
         });
 
-    })();
+        renderColumns();
+    });
+
+})();
 </script>
 @endsection
