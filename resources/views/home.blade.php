@@ -38,7 +38,7 @@
                     <x-heroicon-o-currency-dollar class="w-12 h-12" />
                 </div>
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-700">Total Expenses</h2>
+                    <h2 class="text-xl font-semibold text-gray-700">Total Costs</h2>
                     <p class="text-4xl font-extrabold text-gray-900">
                         ₱{{ number_format($overallExpenses ?? 0, 2) }}
                     </p>
@@ -52,7 +52,7 @@
                     <x-heroicon-o-banknotes class="w-12 h-12" />
                 </div>
                 <div>
-                    <h2 class="text-xl font-semibold text-gray-700">Total Net Income</h2>
+                    <h2 class="text-xl font-semibold text-gray-700">Total Profit</h2>
                     <p class="text-4xl font-extrabold text-gray-900">
                         ₱{{ number_format($totalNetIncome ?? 0, 2) }}
                     </p>
@@ -332,8 +332,8 @@
             labels: labels,
             datasets: [
                 { label: 'Revenue', data: revenue, tension: 0.35, fill: false },
-                { label: 'Expenses', data: expenses, tension: 0.35, fill: false },
-                { label: 'Net Income', data: net, tension: 0.35, fill: false },
+                { label: 'Costs', data: expenses, tension: 0.35, fill: false },
+                { label: 'Profit', data: net, tension: 0.35, fill: false },
             ]
         },
         options: {
@@ -366,8 +366,8 @@
                 labels: labels,
                 datasets: [
                     { label: 'Revenue', data: revenue },
-                    { label: 'Expenses', data: expenses },
-                    { label: 'Net Income', data: net },
+                    { label: 'Costs', data: expenses },
+                    { label: 'Profit', data: net },
                 ]
             },
             options: {

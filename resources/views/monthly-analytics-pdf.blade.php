@@ -75,8 +75,8 @@
         <tr>
             <th>Month</th>
             <th>Revenue (₱)</th>
-            <th>Expenses (₱)</th>
-            <th>Net Income (₱)</th>
+            <th>Costs (₱)</th>
+            <th>Profit(₱)</th>
         </tr>
     </thead>
     <tbody>
@@ -93,8 +93,8 @@
 
 <div class="summary">
     <strong>Total Revenue:</strong> ₱{{ number_format($totalRevenue, 2) }} <br>
-    <strong>Total Expenses:</strong> ₱{{ number_format($totalExpenses, 2) }} <br>
-    <strong>Total Net Income:</strong> ₱{{ number_format($totalNet, 2) }}
+    <strong>Total Costs:</strong> ₱{{ number_format($totalExpenses, 2) }} <br>
+    <strong>Total Profit:</strong> ₱{{ number_format($totalNet, 2) }}
 </div>
 
 </body>
