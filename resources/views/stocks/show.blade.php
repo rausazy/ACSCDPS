@@ -42,15 +42,23 @@
 
     <!-- Add Button -->
     <div class="w-full max-w-7xl flex justify-end mb-10">
-        <button 
-            onclick="document.getElementById('addRawModal').classList.remove('hidden')" 
-            class="flex items-center justify-center gap-2 px-6 py-3
-                   rounded-xl bg-white text-gray-900 font-bold shadow-md
-                   hover:bg-purple-100 hover:shadow-lg transition">
-            <span class="text-lg font-bold">+</span>
-            <span class="text-sm">Add Raw Material</span>
-        </button>
-    </div>
+    <button 
+        onclick="document.getElementById('addRawModal').classList.remove('hidden')" 
+        class="flex items-center justify-center gap-2
+               px-12 py-4
+               min-w-[240px]
+               rounded-xl 
+               bg-white text-gray-900 font-bold text-sm
+               shadow-md
+               transition-all duration-300 ease-in-out
+               hover:bg-purple-100
+               hover:shadow-lg
+               hover:-translate-y-1
+               hover:scale-105">
+        <span class="text-lg font-bold">+</span>
+        <span>Add Raw Material</span>
+    </button>
+</div>
 
     <!-- =============================== -->
     <!-- ✅ RAW MATERIALS LIST VIEW -->
