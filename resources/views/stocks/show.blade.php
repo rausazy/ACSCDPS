@@ -54,55 +54,69 @@
         </button>
     </div>
 
-    <!-- Overall Stats -->
-    @php
-        $overallQuantity = $stock->rawMaterials->sum('quantity');
-        $overallTotalPrice = $stock->rawMaterials->sum(function($raw) { return $raw->quantity * $raw->price; });
-    @endphp
-    <div class="w-full max-w-7xl flex justify-between items-center mb-6">
-        <p class="text-gray-700 font-medium">Overall Quantity: {{ $overallQuantity }}</p>
-        <p class="text-gray-700 font-medium">Overall Total Price: ₱{{ number_format($overallTotalPrice, 2) }}</p>
-    </div>
+   <!-- ✅ Raw Materials List (HOSTED-SAFE LIST VIEW using inline CSS) -->
+<div class="w-full max-w-7xl">
+    <h2 class="text-2xl font-bold mb-4">Raw Materials</h2>
 
-    <!-- Raw Materials List -->
-    <div class="w-full max-w-7xl">
-        <h2 class="text-2xl font-bold mb-4">Raw Materials</h2>
+    @if($stock->rawMaterials->count())
+        <div style="background:#fff; border:1px solid #e5e7eb; border-radius:16px; overflow:hidden; box-shadow:0 6px 16px rgba(0,0,0,.08);">
 
-        @if($stock->rawMaterials->count())
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                @foreach($stock->rawMaterials as $raw)
-                    <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200 flex flex-col justify-between">
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800">{{ $raw->name }}</h3>
-                            <p class="text-sm text-gray-500">Quantity: {{ $raw->quantity }}</p>
-                            <p class="text-sm text-gray-500">Price: ₱{{ number_format($raw->price, 2) }}</p>
-                            <p class="text-sm text-gray-500 font-semibold">
-                                Total: ₱{{ number_format($raw->quantity * $raw->price, 2) }}
-                            </p>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex justify-end mt-4">
-                            <button onclick="openEditModal({{ $raw->id }}, '{{ $raw->name }}', {{ $raw->quantity }}, {{ $raw->price }})"
-                                class="px-3 py-1 rounded-md bg-blue-500 text-white text-sm hover:bg-blue-600 transition mr-2"
-                                style="background-color: rgb(59 130 246);"> <!-- bg-blue-500 -->
-                                Edit
-                            </button>
-
-                            <button type="button" 
-                                onclick="openDeleteModal({{ $raw->id }}, '{{ $raw->name }}')"
-                                class="px-3 py-1 rounded-md bg-red-500 text-white text-sm hover:bg-red-600 transition"
-                                style="background-color: rgb(239 68 68);"> <!-- bg-red-500 -->
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                @endforeach
+            <!-- Header -->
+            <div style="display:grid; grid-template-columns: 3fr 1fr 1fr 1fr 1.2fr; gap:14px;
+                        padding:14px 18px; background:#f9fafb; border-bottom:1px solid #e5e7eb;
+                        font-size:12px; font-weight:700; color:#6b7280;">
+                <div>Name</div>
+                <div>Qty</div>
+                <div>Price</div>
+                <div>Total</div>
+                <div style="text-align:right;">Actions</div>
             </div>
-        @else
-            <p class="text-gray-500">No raw materials added yet.</p>
-        @endif
-    </div>
+
+            <!-- Rows -->
+            @foreach($stock->rawMaterials as $raw)
+                <div style="display:grid; grid-template-columns: 3fr 1fr 1fr 1fr 1.2fr; gap:14px;
+                            padding:16px 18px; align-items:center; border-bottom:1px solid #e5e7eb;">
+
+                    <div style="font-size:14px; font-weight:700; color:#111827;">
+                        {{ $raw->name }}
+                    </div>
+
+                    <div style="font-size:14px; color:#374151;">
+                        {{ $raw->quantity }}
+                    </div>
+
+                    <div style="font-size:14px; color:#374151;">
+                        ₱{{ number_format($raw->price, 2) }}
+                    </div>
+
+                    <div style="font-size:14px; font-weight:700; color:#111827;">
+                        ₱{{ number_format($raw->quantity * $raw->price, 2) }}
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap;">
+                        <!-- ✅ SAME onclick / SAME functions (hindi binago) -->
+                        <button onclick="openEditModal({{ $raw->id }}, '{{ $raw->name }}', {{ $raw->quantity }}, {{ $raw->price }})"
+                            style="padding:7px 12px; border-radius:10px; font-size:12px; font-weight:700;
+                                   color:#fff; background:rgb(59 130 246); border:none; cursor:pointer;">
+                            Edit
+                        </button>
+
+                        <button type="button"
+                            onclick="openDeleteModal({{ $raw->id }}, '{{ $raw->name }}')"
+                            style="padding:7px 12px; border-radius:10px; font-size:12px; font-weight:700;
+                                   color:#fff; background:rgb(239 68 68); border:none; cursor:pointer;">
+                            Delete
+                        </button>
+                    </div>
+
+                </div>
+            @endforeach
+
+        </div>
+    @else
+        <p class="text-gray-500">No raw materials added yet.</p>
+    @endif
+</div>
 
     <!-- ✅ Add Raw Material Modal -->
     <div id="addRawModal" class="hidden fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-50">
@@ -123,6 +137,7 @@
                     <input type="checkbox" id="has_sizes" name="has_sizes" style="height:16px; width:16px; accent-color:#9333ea; cursor:pointer;">
                     <label for="has_sizes" style="color:#374151; font-weight:500; cursor:pointer;">Has Sizes?</label>
                 </div>
+
                 <!-- Normal Fields (hidden if sizes enabled) -->
                 <div id="normalFields">
                     <div class="mb-4">
@@ -197,7 +212,7 @@
                     </button>
                     <button type="submit" 
                         class="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition w-full sm:w-auto"
-                        style="background-color: rgb(59 130 246);"> <!-- bg-blue-500 -->
+                        style="background-color: rgb(59 130 246);">
                         Update
                     </button>
                 </div>
@@ -220,7 +235,7 @@
                     </button>
                     <button type="submit" 
                         class="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition w-full sm:w-auto"
-                        style="background-color: rgb(239 68 68); margin-left: 0.5rem;"> <!-- bg-red-500 -->
+                        style="background-color: rgb(239 68 68); margin-left: 0.5rem;">
                         Delete
                     </button>
                 </div>
@@ -254,24 +269,24 @@
         div.classList.add('flex', 'space-x-2');
         div.innerHTML = `
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-    <input type="text" name="sizes[${sizeIndex}][name]" placeholder="Size" 
-        style="flex:1; min-width:80px; max-width:120px; padding:6px 10px; 
-               border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
+                <input type="text" name="sizes[${sizeIndex}][name]" placeholder="Size" 
+                    style="flex:1; min-width:80px; max-width:120px; padding:6px 10px; 
+                           border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
 
-    <input type="number" name="sizes[${sizeIndex}][quantity]" placeholder="Quantity" min="0"
-        style="flex:1; min-width:100px; max-width:120px; padding:6px 10px; 
-               border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
+                <input type="number" name="sizes[${sizeIndex}][quantity]" placeholder="Quantity" min="0"
+                    style="flex:1; min-width:100px; max-width:120px; padding:6px 10px; 
+                           border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
 
-    <input type="number" step="0.01" name="sizes[${sizeIndex}][price]" placeholder="Price" min="0"
-        style="flex:1; min-width:100px; max-width:140px; padding:6px 10px; 
-               border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
-</div>
+                <input type="number" step="0.01" name="sizes[${sizeIndex}][price]" placeholder="Price" min="0"
+                    style="flex:1; min-width:100px; max-width:140px; padding:6px 10px; 
+                           border:1px solid #d1d5db; border-radius:6px; font-size:14px;" required>
+            </div>
         `;
         sizesContainer.appendChild(div);
         sizeIndex++;
     }
 
-    // Edit & Delete Modal
+    // Edit & Delete Modal (✅ SAME FUNCTIONS - NOT CHANGED)
     function openEditModal(id, name, quantity, price){
         const modal = document.getElementById('editRawModal');
         modal.classList.remove('hidden');
