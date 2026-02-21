@@ -62,6 +62,7 @@
 
     </div>
 
+    <!-- ✅ Low Stocks + Best Sellers + Restock Board -->
     <div class="w-full max-w-6xl mb-16">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
@@ -100,8 +101,89 @@
             </div>
 
         </div>
+
+        <!-- ✅ ONE CARD: Restock Board (4 Columns, colored headers, smooth transitions) -->
+        <div class="mt-8 bg-white rounded-2xl shadow-lg p-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">🧾 Restock Board</h2>
+                <p class="text-sm text-gray-500">
+                    Update status using the dropdown — items will move smoothly.
+                </p>
+            </div>
+
+            @if($lowStocks->count())
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+                    <!-- Products -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-sm text-gray-700">Products</h3>
+                            <span id="count-products"
+                                class="text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 text-gray-700">0</span>
+                        </div>
+                        <div id="rb-product-list" class="space-y-3"></div>
+                    </div>
+
+                    <!-- To Buy -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-sm text-amber-900">To Buy</h3>
+                            <span id="count-to_buy"
+                                class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-900">0</span>
+                        </div>
+                        <div id="col-to_buy" class="min-h-[230px] rounded-xl p-3 space-y-2 border bg-amber-50"></div>
+                    </div>
+
+                    <!-- On Going -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-sm text-sky-900">On Going</h3>
+                            <span id="count-on_going"
+                                class="text-xs font-semibold px-2 py-1 rounded-full bg-sky-100 text-sky-900">0</span>
+                        </div>
+                        <div id="col-on_going" class="min-h-[230px] rounded-xl p-3 space-y-2 border bg-sky-50"></div>
+                    </div>
+
+                    <!-- Done -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-bold text-sm text-emerald-900">Done</h3>
+                            <span id="count-done"
+                                class="text-xs font-semibold px-2 py-1 rounded-full bg-emerald-100 text-emerald-900">0</span>
+                        </div>
+                        <div id="col-done" class="min-h-[230px] rounded-xl p-3 space-y-2 border bg-emerald-50"></div>
+                    </div>
+
+                </div>
+
+                <!-- tiny helper style for smooth animation -->
+                <style>
+                    .rb-card {
+                        transition: transform 250ms ease, opacity 250ms ease, box-shadow 250ms ease;
+                    }
+                    .rb-card.rb-enter {
+                        opacity: 0;
+                        transform: translateY(6px);
+                    }
+                    .rb-card.rb-enter-active {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                    .rb-badge {
+                        transition: transform 250ms ease, opacity 250ms ease, box-shadow 250ms ease;
+                    }
+                    .rb-badge.rb-pop {
+                        transform: scale(0.97);
+                        opacity: 0.2;
+                    }
+                </style>
+            @else
+                <p class="text-gray-500 italic">No low stock items to track.</p>
+            @endif
+        </div>
     </div>
 
+    <!-- Monthly Analytics -->
     <div class="w-full max-w-6xl bg-white rounded-2xl shadow-lg p-8">
 
         <!-- ✅ Row 1: Title + Dropdown -->
@@ -110,11 +192,11 @@
                 📊 Monthly Analytics
             </h2>
 
-<select id="yearSelect"
-    class="border border-gray-300 rounded-xl px-4 py-2 
-           text-sm sm:text-base
-           focus:outline-none focus:ring-2 focus:ring-purple-500 
-           shadow-sm w-fit sm:ml-3">
+            <select id="yearSelect"
+                class="border border-gray-300 rounded-xl px-4 py-2 
+                       text-sm sm:text-base
+                       focus:outline-none focus:ring-2 focus:ring-purple-500 
+                       shadow-sm w-fit sm:ml-3">
                 @foreach($availableYears as $yr)
                     <option value="{{ $yr }}" {{ (int)$selectedYear === (int)$yr ? 'selected' : '' }}>
                         {{ $yr }}
@@ -155,6 +237,9 @@
 
 <script>
     (function () {
+        // =========================
+        // Chart Vars
+        // =========================
         const labels = @json($chartLabels ?? []);
         const revenue = @json($chartRevenue ?? []);
         const expenses = @json($chartExpenses ?? []);
@@ -276,6 +361,149 @@
                 }, 600);
             }, 200);
         });
+
+        // =========================
+        // ✅ Restock Board (no qty left, colored, smooth transitions)
+        // =========================
+        document.addEventListener("DOMContentLoaded", function() {
+            const productList = document.getElementById("rb-product-list");
+            const colToBuy = document.getElementById("col-to_buy");
+            const colOnGoing = document.getElementById("col-on_going");
+            const colDone = document.getElementById("col-done");
+
+            const countProducts = document.getElementById("count-products");
+            const countToBuy = document.getElementById("count-to_buy");
+            const countOnGoing = document.getElementById("count-on_going");
+            const countDone = document.getElementById("count-done");
+
+            if (!productList || !colToBuy || !colOnGoing || !colDone) return;
+
+            const items = @json($lowStocks->map(function($i){
+                return ['id'=>$i->id,'name'=>$i->name];
+            })->values());
+
+            const key = "restock_board_pretty_v1";
+            let statuses = {};
+            try { statuses = JSON.parse(localStorage.getItem(key) || "{}"); } catch(e){ statuses = {}; }
+
+            function save() {
+                localStorage.setItem(key, JSON.stringify(statuses));
+            }
+
+            function animateIn(el) {
+                el.classList.add('rb-enter');
+                requestAnimationFrame(() => {
+                    el.classList.add('rb-enter-active');
+                    setTimeout(() => {
+                        el.classList.remove('rb-enter');
+                        el.classList.remove('rb-enter-active');
+                    }, 260);
+                });
+            }
+
+            function createBadge(item, tint) {
+                const div = document.createElement("div");
+                div.className = "rb-badge bg-white border rounded-xl p-3 text-sm shadow-sm";
+                div.style.borderColor = tint.border;
+                div.style.boxShadow = "0 3px 12px rgba(0,0,0,0.06)";
+                div.innerHTML = `
+                    <div class="font-semibold text-gray-800">${item.name}</div>
+                `;
+                return div;
+            }
+
+            function renderColumns(withPop = false) {
+                colToBuy.innerHTML = "";
+                colOnGoing.innerHTML = "";
+                colDone.innerHTML = "";
+
+                let cToBuy = 0, cOnGoing = 0, cDone = 0;
+
+                items.forEach(item => {
+                    const status = statuses[item.id] || "to_buy";
+
+                    if (status === "to_buy") {
+                        const badge = createBadge(item, { border: "#fbbf24" });
+                        colToBuy.appendChild(badge);
+                        if (withPop) badge.classList.add('rb-pop');
+                        setTimeout(()=> badge.classList.remove('rb-pop'), 220);
+                        cToBuy++;
+                    }
+
+                    if (status === "on_going") {
+                        const badge = createBadge(item, { border: "#38bdf8" });
+                        colOnGoing.appendChild(badge);
+                        if (withPop) badge.classList.add('rb-pop');
+                        setTimeout(()=> badge.classList.remove('rb-pop'), 220);
+                        cOnGoing++;
+                    }
+
+                    if (status === "done") {
+                        const badge = createBadge(item, { border: "#34d399" });
+                        colDone.appendChild(badge);
+                        if (withPop) badge.classList.add('rb-pop');
+                        setTimeout(()=> badge.classList.remove('rb-pop'), 220);
+                        cDone++;
+                    }
+                });
+
+                // Empty text
+                if (!colToBuy.children.length) colToBuy.innerHTML = `<p class="text-xs text-amber-700/70 italic">No items</p>`;
+                if (!colOnGoing.children.length) colOnGoing.innerHTML = `<p class="text-xs text-sky-700/70 italic">No items</p>`;
+                if (!colDone.children.length) colDone.innerHTML = `<p class="text-xs text-emerald-700/70 italic">No items</p>`;
+
+                // Counts
+                if (countProducts) countProducts.textContent = items.length;
+                if (countToBuy) countToBuy.textContent = cToBuy;
+                if (countOnGoing) countOnGoing.textContent = cOnGoing;
+                if (countDone) countDone.textContent = cDone;
+            }
+
+            // Build product list
+            productList.innerHTML = "";
+            items.forEach(item => {
+                const wrapper = document.createElement("div");
+                wrapper.className = "rb-card bg-white border border-gray-200 rounded-2xl p-3 shadow-sm hover:shadow-md";
+                wrapper.innerHTML = `
+                    <div class="flex justify-between items-center gap-3">
+                        <div class="min-w-0">
+                            <div class="font-bold text-sm text-gray-800 truncate">${item.name}</div>
+                        </div>
+
+                        <select class="border border-gray-300 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                data-id="${item.id}">
+                            <option value="to_buy">To Buy</option>
+                            <option value="on_going">On Going</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                `;
+
+                const sel = wrapper.querySelector("select");
+                sel.value = statuses[item.id] || "to_buy";
+
+                sel.addEventListener("change", function() {
+                    statuses[item.id] = this.value;
+                    save();
+
+                    // quick soft animation
+                    wrapper.style.opacity = "0.6";
+                    wrapper.style.transform = "translateY(1px)";
+                    setTimeout(() => {
+                        wrapper.style.opacity = "1";
+                        wrapper.style.transform = "translateY(0)";
+                    }, 180);
+
+                    renderColumns(true);
+                });
+
+                productList.appendChild(wrapper);
+                animateIn(wrapper);
+            });
+
+            renderColumns(false);
+        });
+
     })();
 </script>
 @endsection
