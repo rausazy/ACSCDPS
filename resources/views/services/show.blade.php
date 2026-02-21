@@ -6,7 +6,7 @@
 <div style="min-height:100vh; display:flex; flex-direction:column; align-items:center; padding-top:4rem; padding-bottom:4rem; padding-left:1rem; padding-right:1rem;">
 
 <div style="width:100%; max-width:80rem; margin-bottom:1.5rem;">
-    <a href="{{ url('/services') }}" 
+    <a href="{{ url('/services') }}"
         style="display:inline-flex; align-items:center; color:#9333ea; font-weight:500; text-decoration:none; transition:color .2s ease;">
         <svg xmlns="http://www.w3.org/2000/svg" style="height:20px; width:20px; margin-right:0.5rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -67,17 +67,17 @@
                 <select id="rawSelect" style="width:100%;border:1px solid #d1d5db;border-radius:0.375rem;padding:0.5rem 0.75rem;">
                     <option value="">-- Choose Raw Material --</option>
                     @foreach($rawMaterials as $raw)
-                        <option value="{{ $raw->id }}" 
-                                data-name="{{ $raw->name }}" 
+                        <option value="{{ $raw->id }}"
+                                data-name="{{ $raw->name }}"
                                 data-price="{{ $raw->price }}">
                             {{ $raw->name }}
                         </option>
                     @endforeach
                 </select>
-                <button type="button" id="addRawBtn" 
+                <button type="button" id="addRawBtn"
                     style="margin-top:0.75rem;padding:0.5rem 1rem;color:#fff;border-radius:0.375rem;font-weight:500;background-color:rgb(139,92,246);cursor:pointer;transition:background-color .2s ease;display:inline-block;">
                     Add
-                </button>   
+                </button>
             </div>
 
         <table class="responsive-table" style="width:100%; border-collapse:collapse; border:1px solid #e5e7eb; table-layout:fixed;">
@@ -93,27 +93,105 @@
             <tbody id="costingBody"></tbody>
         </table>
 
-        <div style="margin-top:1.5rem; text-align:right;">
-            <h3 style="font-size:1.125rem; font-weight:700; color:#1f2937; margin:0.25rem 0;">Overall Cost: <span id="overallCost" style="color:#000000;">₱0.00</span></h3>
-            <h3 style="font-size:1.125rem; font-weight:700; color:#1f2937; margin:0.25rem 0;">Overall Revenue: <span id="overallRevenue" style="color:#000000;">₱0.00</span></h3>
+        <!-- ✅ Summary table: Total Cost / Direct Labor / Allocated Overhead -->
+        <div style="margin-top:1.25rem; overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; border:1px solid #e5e7eb; table-layout:fixed;">
+                <thead>
+                    <tr style="background-color:#f9fafb; color:#374151;">
+                        <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:700;">Total Job Cost</th>
+                        <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:700;">Direct Labor</th>
+                        <th style="border:1px solid #e5e7eb; padding:0.75rem 1rem; text-align:left; font-size:0.875rem; font-weight:700;">Allocated Overhead</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background:#fff;">
+                        <td style="border:1px solid #e5e7eb; padding:0.75rem 1rem; font-weight:800; color:#111827;">
+                            <span id="overallCost">₱0.00</span>
+                            <div style="margin-top:0.35rem; font-size:0.8rem; color:#6b7280;">
+                            </div>
+                        </td>
+
+                        <!-- Direct labor -->
+                        <td style="border:1px solid #e5e7eb; padding:0.75rem 1rem;">
+                            <div style="display:flex; flex-direction:column; gap:0.55rem;">
+                                <div style="font-size:0.85rem; color:#374151; font-weight:700;">Time spent</div>
+
+                                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                                    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                                        <label style="font-size:0.8rem; color:#6b7280;">Hours</label>
+                                        <input type="number" id="laborHours" step="1" min="0" value="0"
+                                            style="width:110px; padding:0.35rem 0.6rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none;">
+                                    </div>
+
+                                    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                                        <label style="font-size:0.8rem; color:#6b7280;">Minutes</label>
+                                        <input type="number" id="laborMinutes" step="1" min="0" max="59" value="0"
+                                            oninput="this.value = Math.min(59, Math.max(0, parseInt(this.value || 0)));"
+                                            style="width:110px; padding:0.35rem 0.6rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none;">
+                                    </div>
+                                </div>
+
+                                <div style="font-size:0.9rem; color:#111827; font-weight:900;">
+                                    ₱<span id="directLaborCost">0.00</span>
+                                </div>
+
+                                <div style="font-size:0.75rem; color:#6b7280;">
+                                    Rate: ₱<span id="laborRate">0.00</span>/hr
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Overhead -->
+                        <td style="border:1px solid #e5e7eb; padding:0.75rem 1rem;">
+                            <div style="display:flex; flex-direction:column; gap:0.55rem;">
+                                <div style="font-size:0.85rem; color:#374151; font-weight:700;">Time used</div>
+
+                                <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                                    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                                        <label style="font-size:0.8rem; color:#6b7280;">Hours</label>
+                                        <input type="number" id="ohHours" step="1" min="0" value="0"
+                                            style="width:110px; padding:0.35rem 0.6rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none;">
+                                    </div>
+
+                                    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+                                        <label style="font-size:0.8rem; color:#6b7280;">Minutes</label>
+                                        <input type="number" id="ohMinutes" step="1" min="0" max="59" value="0"
+                                            oninput="this.value = Math.min(59, Math.max(0, parseInt(this.value || 0)));"
+                                            style="width:110px; padding:0.35rem 0.6rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none;">
+                                    </div>
+                                </div>
+
+                                <div style="font-size:0.9rem; color:#111827; font-weight:900;">
+                                    ₱<span id="overheadCost">0.00</span>
+                                </div>
+
+                                <div style="font-size:0.75rem; color:#6b7280;">
+                                    Rate: ₱<span id="overheadRate">0.00</span>/hr
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+
     @else
         <p style="color:#6b7280; padding:1rem; border:1px dashed #d1d5db; border-radius:0.5rem; text-align:center;">No raw materials available for this service.</p>
     @endif
 </div>
 
-<div style="width:100%; max-width:80rem; padding:1.5rem; border-radius:1rem; box-shadow:0 4px 6px rgba(0,0,0,0.1); background:#fff; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:2rem auto 0;"> 
+<div style="width:100%; max-width:80rem; padding:1.5rem; border-radius:1rem; box-shadow:0 4px 6px rgba(0,0,0,0.1); background:#fff; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:2rem auto 0;">
     <h2 style="font-size:1.5rem; font-weight:700; margin-bottom:1rem; display:flex; flex-direction:column; gap:0.5rem; color:#1f2937;">
         <span style="text-align:left;">Quotation</span>
 
-        <form id="pdfForm" method="POST" 
-            action="{{ route('services.costing-pdf', $service->url) }}" 
-            target="_blank" 
-            onsubmit="preparePdfData(event)" 
+        <form id="pdfForm" method="POST"
+            action="{{ route('services.costing-pdf', $service->url) }}"
+            target="_blank"
+            onsubmit="preparePdfData(event)"
             style="margin-top:0.5rem; text-align:left;">
             @csrf
             <input type="hidden" name="costing_data" id="costingDataInput">
-            <button type="submit" 
+            <button type="submit"
                 style="background-color:#9333ea; color:white; font-weight:500; border-radius:0.375rem; padding:0.375rem 0.75rem; font-size:0.875rem; line-height:1.25rem; cursor:pointer; transition:background-color .2s ease; border:none;">
                 Export as PDF
             </button>
@@ -153,7 +231,14 @@
             </tr>
         </tbody>
     </table>
-    
+
+    <!-- ✅ OVERALL REVENUE moved here (under quotation table) -->
+    <div style="margin-top:1.25rem; text-align:right;">
+        <h3 style="font-size:1.125rem; font-weight:800; color:#1f2937; margin:0;">
+            Overall Revenue: <span id="overallRevenue" style="color:#000000;">₱0.00</span>
+        </h3>
+    </div>
+
     <div style="margin-top:2rem; text-align:center;">
         <button type="button" id="confirmOrderBtn" onclick="confirmOrder()"
             style="background-color:#10b981; color:white; font-weight:700; border-radius:0.375rem; padding:0.6rem 2rem; font-size:1.125rem; cursor:pointer; transition:background-color .2s ease; min-width:200px; border:none; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);">
@@ -177,7 +262,7 @@
 <!-- ✅ Already Saved Modal (NEW) -->
 <div id="alreadySavedModal" style="display:none; position:fixed; z-index:1001; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);">
     <div style="background-color:#ffffff; margin:15% auto; padding:28px; border:1px solid rgba(0,0,0,0.08); width:90%; max-width:520px; border-radius:1rem; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,0.18);">
-        
+
         <div style="width:70px;height:70px;margin:0 auto 14px; border-radius:9999px; background:rgba(59,130,246,0.12); display:flex; align-items:center; justify-content:center;">
             <svg xmlns="http://www.w3.org/2000/svg" style="width:34px;height:34px;color:#3b82f6;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="10"></circle>
@@ -222,7 +307,7 @@
     }
     .responsive-table td:last-child {border-bottom:none;}
     .responsive-table td::before {content:attr(data-label);font-weight:600;color:#374151;margin-right:0.5rem;}
-    .responsive-table td input[type="number"], 
+    .responsive-table td input[type="number"],
     .responsive-table td input[type="text"] {
         text-align: right;
         flex-grow: 1;
@@ -235,6 +320,7 @@
 const costingBody = document.getElementById('costingBody');
 const rawSelect = document.getElementById('rawSelect');
 const addRawBtn = document.getElementById('addRawBtn');
+
 const overallCostEl = document.getElementById('overallCost');
 const overallRevenueEl = document.getElementById('overallRevenue');
 
@@ -245,10 +331,33 @@ const quoteCostPerPiece = document.getElementById('quoteCostPerPiece');
 const quoteSellingPrice = document.getElementById('quoteSellingPrice');
 const quoteTotal = document.getElementById('quoteTotal');
 
-const confirmationModal = document.getElementById('confirmationModal'); 
+const laborHoursInput = document.getElementById('laborHours');
+const laborMinutesInput = document.getElementById('laborMinutes');
+const directLaborCostEl = document.getElementById('directLaborCost');
+const laborRateEl = document.getElementById('laborRate');
+
+const ohHoursInput = document.getElementById('ohHours');
+const ohMinutesInput = document.getElementById('ohMinutes');
+const overheadCostEl = document.getElementById('overheadCost');
+const overheadRateEl = document.getElementById('overheadRate');
+
+const confirmationModal = document.getElementById('confirmationModal');
 const alreadySavedModal = document.getElementById('alreadySavedModal');
 
 let currentQuoteTotal = 0;
+
+// ✅ Direct labor constants
+const MONTHLY_SALARY = 25000;
+const TOTAL_WORK_HOURS = 208;
+const LABOR_RATE_PER_HOUR = MONTHLY_SALARY / TOTAL_WORK_HOURS;
+
+// ✅ Overhead constants
+const MONTHLY_OVERHEAD = 25400;
+const OVERHEAD_RATE_PER_HOUR = MONTHLY_OVERHEAD / TOTAL_WORK_HOURS;
+
+// show rates
+if (laborRateEl) laborRateEl.innerText = LABOR_RATE_PER_HOUR.toFixed(2);
+if (overheadRateEl) overheadRateEl.innerText = OVERHEAD_RATE_PER_HOUR.toFixed(2);
 
 // ✅ guards (anti double-submit)
 let isSubmittingOrder = false;
@@ -290,28 +399,67 @@ function closeAlreadySavedModal() {
     if (alreadySavedModal) alreadySavedModal.style.display = 'none';
 }
 
+function calculateDirectLabor() {
+    const h = parseFloat(laborHoursInput?.value) || 0;
+    let m = parseFloat(laborMinutesInput?.value) || 0;
+    if (m < 0) m = 0;
+    if (m > 59) m = 59;
+
+    const totalHours = h + (m / 60);
+    const laborCost = LABOR_RATE_PER_HOUR * totalHours;
+
+    if (directLaborCostEl) directLaborCostEl.innerText = laborCost.toFixed(2);
+    return laborCost;
+}
+
+function calculateOverhead() {
+    const h = parseFloat(ohHoursInput?.value) || 0;
+    let m = parseFloat(ohMinutesInput?.value) || 0;
+    if (m < 0) m = 0;
+    if (m > 59) m = 59;
+
+    const totalHours = h + (m / 60);
+    const overheadCost = OVERHEAD_RATE_PER_HOUR * totalHours;
+
+    if (overheadCostEl) overheadCostEl.innerText = overheadCost.toFixed(2);
+    return overheadCost;
+}
+
 function updateTotals() {
-    let overallTotal = 0;
+    // materials total
+    let materialsTotal = 0;
     const rows = costingBody.querySelectorAll('tr');
+
     rows.forEach(row => {
         const qtyInput = row.querySelector('.quantity-input');
         const priceInput = row.querySelector('.unit-price-input');
         const totalEl = row.querySelector('.total-price');
+
         const qty = parseFloat(qtyInput.value) || 0;
         const price = parseFloat(priceInput.value) || 0;
         const total = qty * price;
+
         totalEl.innerText = '₱' + total.toFixed(2);
-        overallTotal += total;
+        materialsTotal += total;
     });
-    overallCostEl.innerText = '₱' + overallTotal.toFixed(2);
-    overallRevenueEl.innerText = '₱' + (overallTotal + currentQuoteTotal).toFixed(2);
+
+    const laborTotal = calculateDirectLabor();
+    const overheadTotal = calculateOverhead();
+
+    const totalCost = materialsTotal + laborTotal + overheadTotal;
+
+    overallCostEl.innerText = '₱' + totalCost.toFixed(2);
+
+    // revenue is displayed under quotation table now, but same element id
+    overallRevenueEl.innerText = '₱' + (totalCost + currentQuoteTotal).toFixed(2);
 }
 
 function updateQuotation() {
     const qty = parseFloat(quoteQty.value) || 0;
     const markup = parseFloat(quoteMarkup.value) || 0;
     const discount = parseFloat(quoteDiscount.value) || 0;
-    const overallCost = [...costingBody.querySelectorAll('tr')].reduce((sum, row) => {
+
+    const materialsCost = [...costingBody.querySelectorAll('tr')].reduce((sum, row) => {
         const qtyInput = row.querySelector('.quantity-input');
         const priceInput = row.querySelector('.unit-price-input');
         const qtyVal = parseFloat(qtyInput.value) || 0;
@@ -319,14 +467,21 @@ function updateQuotation() {
         return sum + (qtyVal * priceVal);
     }, 0);
 
+    const laborCost = calculateDirectLabor();
+    const overheadCost = calculateOverhead();
+
+    const overallCost = materialsCost + laborCost + overheadCost;
+
     if(qty > 0) {
         const costPerPiece = overallCost / qty;
         const sellingPricePerPiece = costPerPiece + markup;
         const totalSellingPrice = sellingPricePerPiece * qty;
         const finalTotal = totalSellingPrice - (totalSellingPrice * (discount / 100));
+
         quoteCostPerPiece.innerText = '₱' + costPerPiece.toFixed(2);
         quoteSellingPrice.innerText = '₱' + sellingPricePerPiece.toFixed(2);
         quoteTotal.innerText = '₱' + finalTotal.toFixed(2);
+
         currentQuoteTotal = finalTotal;
     } else {
         quoteCostPerPiece.innerText = '₱0.00';
@@ -334,19 +489,23 @@ function updateQuotation() {
         quoteTotal.innerText = '₱0.00';
         currentQuoteTotal = 0;
     }
+
     updateTotals();
 }
 
 addRawBtn.addEventListener('click', () => {
     const selectedOption = rawSelect.options[rawSelect.selectedIndex];
     if(selectedOption.value === "") return;
+
     const rawId = selectedOption.value;
     const rawName = selectedOption.dataset.name;
     const unitPrice = selectedOption.dataset.price || 0;
+
     if([...costingBody.querySelectorAll('tr')].some(r => r.dataset.id == rawId)) {
         alert('Raw material already added!');
         return;
     }
+
     const row = document.createElement('tr');
     row.dataset.id = rawId;
     row.classList.add('hover:bg-gray-50');
@@ -364,10 +523,13 @@ addRawBtn.addEventListener('click', () => {
         </td>
     `;
     costingBody.appendChild(row);
+
     const qtyInput = row.querySelector('.quantity-input');
     const removeBtn = row.querySelector('.remove-btn');
+
     qtyInput.addEventListener('input', () => { updateTotals(); updateQuotation(); });
     removeBtn.addEventListener('click', () => { row.remove(); updateTotals(); updateQuotation(); });
+
     updateTotals();
     updateQuotation();
 });
@@ -375,6 +537,11 @@ addRawBtn.addEventListener('click', () => {
 quoteQty.addEventListener('input', updateQuotation);
 quoteMarkup.addEventListener('input', updateQuotation);
 quoteDiscount.addEventListener('input', updateQuotation);
+
+if (laborHoursInput) laborHoursInput.addEventListener('input', () => { updateTotals(); updateQuotation(); });
+if (laborMinutesInput) laborMinutesInput.addEventListener('input', () => { updateTotals(); updateQuotation(); });
+if (ohHoursInput) ohHoursInput.addEventListener('input', () => { updateTotals(); updateQuotation(); });
+if (ohMinutesInput) ohMinutesInput.addEventListener('input', () => { updateTotals(); updateQuotation(); });
 
 function getRawMaterialData() {
     const rawMaterials = [];
@@ -404,17 +571,14 @@ function closeModal() {
 
 // ✅ confirmOrder with anti-duplicate + modal
 function confirmOrder() {
-    // prevent double click while request is in-flight
     if (isSubmittingOrder) {
         openAlreadySavedModal();
         return;
     }
 
     updateQuotation();
-
     const rawMaterials = getRawMaterialData();
 
-    // validations
     if (!document.getElementById('customerName').value.trim() ||
         !document.getElementById('customerEmail').value.trim() ||
         !document.getElementById('customerPhone').value.trim()) {
@@ -452,18 +616,15 @@ function confirmOrder() {
         }
     };
 
-    // prevent same order being submitted twice (even after finish)
     const fp = fingerprintOrder(orderData);
     if (lastOrderFingerprint && lastOrderFingerprint === fp) {
         openAlreadySavedModal();
         return;
     }
 
-    // ✅ lock NOW (before fetch)
     isSubmittingOrder = true;
     lastOrderFingerprint = fp;
 
-    // disable button immediately
     const btn = document.getElementById('confirmOrderBtn');
     if (btn) {
         btn.disabled = true;
@@ -489,7 +650,6 @@ function confirmOrder() {
         if (!res.ok) {
             console.error("Failed:", payload);
 
-            // allow retry on failure
             isSubmittingOrder = false;
             lastOrderFingerprint = null;
 
@@ -502,14 +662,12 @@ function confirmOrder() {
     .catch(err => {
         console.error(err);
 
-        // allow retry on failure
         isSubmittingOrder = false;
         lastOrderFingerprint = null;
 
         alert('Failed to save order.');
     })
     .finally(() => {
-        // keep isSubmittingOrder=true on success so later clicks show Already Saved modal
         if (btn) {
             btn.disabled = false;
             btn.style.opacity = "1";
@@ -522,7 +680,7 @@ function confirmOrder() {
 function preparePdfData(event) {
     if (event) event.preventDefault();
     updateQuotation();
-    
+
     if (parseFloat(document.getElementById('quoteQty').value) <= 0 || parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) <= 0) {
         alert('Please set a valid Quantity and Quotation before exporting to PDF.');
         return;
@@ -531,14 +689,14 @@ function preparePdfData(event) {
         alert('Please fill out the Customer Name before exporting the quotation.');
         return;
     }
-    
+
     const data = {
         service: "{{ $service->name }}",
         quantity: document.getElementById('quoteQty').value || 0,
         selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
         discount: parseFloat(document.getElementById('quoteDiscount').value) || 0,
         total_price: parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0,
-        raw_materials: getRawMaterialData(), 
+        raw_materials: getRawMaterialData(),
         customer: {
             name: document.getElementById('customerName').value,
             email: document.getElementById('customerEmail').value,
@@ -547,16 +705,14 @@ function preparePdfData(event) {
         }
     };
     document.getElementById('costingDataInput').value = JSON.stringify(data);
-    document.getElementById('pdfForm').submit();    
+    document.getElementById('pdfForm').submit();
 }
 
-// Close modal when clicking outside 
 window.onclick = function(event) {
     if (event.target == confirmationModal) closeModal();
     if (alreadySavedModal && event.target == alreadySavedModal) closeAlreadySavedModal();
 }
 
-// Initial calculation on load
 document.addEventListener('DOMContentLoaded', () => {
     updateTotals();
     updateQuotation();
