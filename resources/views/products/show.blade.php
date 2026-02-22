@@ -107,19 +107,14 @@
 
                     <tbody>
                         <tr style="background:#fff;">
-                            <!-- ✅ Total cost (Materials + Direct Labor + Overhead) -->
                             <td style="border:1px solid #e5e7eb; padding:0.75rem 1rem; font-weight:800; color:#111827;">
                                 <span id="overallCost">₱0.00</span>
-                                <div style="margin-top:0.35rem; font-size:0.8rem; color:#6b7280;">
-                                </div>
+                                <div style="margin-top:0.35rem; font-size:0.8rem; color:#6b7280;"></div>
                             </td>
 
-                            <!-- ✅ Direct Labor inputs: Hours + Minutes -->
                             <td style="border:1px solid #e5e7eb; padding:0.75rem 1rem;">
                                 <div style="display:flex; flex-direction:column; gap:0.55rem;">
-                                    <div style="font-size:0.85rem; color:#374151; font-weight:700;">
-                                        Time spent
-                                    </div>
+                                    <div style="font-size:0.85rem; color:#374151; font-weight:700;">Time spent</div>
 
                                     <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
                                         <div style="display:flex; flex-direction:column; gap:0.25rem;">
@@ -146,12 +141,9 @@
                                 </div>
                             </td>
 
-                            <!-- ✅ Overhead inputs: Hours + Minutes (same style) -->
                             <td style="border:1px solid #e5e7eb; padding:0.75rem 1rem;">
                                 <div style="display:flex; flex-direction:column; gap:0.55rem;">
-                                    <div style="font-size:0.85rem; color:#374151; font-weight:700;">
-                                        Time used
-                                    </div>
+                                    <div style="font-size:0.85rem; color:#374151; font-weight:700;">Time used</div>
 
                                     <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
                                         <div style="display:flex; flex-direction:column; gap:0.25rem;">
@@ -351,6 +343,9 @@ if (overheadRateEl) overheadRateEl.innerText = OVERHEAD_RATE_PER_HOUR.toFixed(2)
 let isSubmittingOrder = false;
 let lastOrderFingerprint = null;
 
+// ✅ IMPORTANT: keep displayed selling price for saving + PDF consistency
+let sellingPriceDisplayedForExport = 0;
+
 function fingerprintOrder(orderData) {
     return JSON.stringify({
         customer: {
@@ -450,6 +445,12 @@ function updateTotals() {
     }
 }
 
+/**
+ * ✅ QUOTATION (CLEAN VERSION)
+ * - Selling price is based on DISPLAYED cost per unit (rounded 2dp) + markup
+ * - Total is qty * displayed selling price (then discount)
+ * - No hidden "butal" surprises
+ */
 function updateQuotation() {
     const qty = parseFloat(quoteQty.value) || 0;
     const markup = parseFloat(quoteMarkup.value) || 0;
@@ -466,25 +467,35 @@ function updateQuotation() {
     const laborCost = calculateDirectLabor();
     const overheadCost = calculateOverhead();
 
-    // ✅ cost per unit uses materials + labor + overhead
     const overallCost = materialsCost + laborCost + overheadCost;
 
-    if(qty > 0) {
-        const costPerPiece = overallCost / qty;
-        const sellingPricePerPiece = costPerPiece + markup;
-        const totalSellingPrice = sellingPricePerPiece * qty;
-        const finalTotal = totalSellingPrice - (totalSellingPrice * (discount / 100));
+    if (qty > 0) {
+        // exact then display
+        const costPerPieceExact = overallCost / qty;
+        const costPerPieceDisplayed = parseFloat(costPerPieceExact.toFixed(2));
 
-        quoteCostPerPiece.innerText = '₱' + costPerPiece.toFixed(2);
-        quoteSellingPrice.innerText = '₱' + sellingPricePerPiece.toFixed(2);
-        quoteTotal.innerText = '₱' + finalTotal.toFixed(2);
+        // ✅ selling price based on displayed cost + markup
+        const sellingDisplayed = parseFloat((costPerPieceDisplayed + markup).toFixed(2));
+
+        // ✅ total based on displayed selling
+        const grossTotal = qty * sellingDisplayed;
+        const finalTotal = grossTotal - (grossTotal * (discount / 100));
+
+        quoteCostPerPiece.innerText = '₱' + costPerPieceDisplayed.toFixed(2);
+        quoteSellingPrice.innerText = '₱' + sellingDisplayed.toFixed(2);
+
+        const finalShown = Number.isInteger(finalTotal) ? finalTotal.toFixed(0) : finalTotal.toFixed(2);
+        quoteTotal.innerText = '₱' + finalShown;
 
         currentQuoteTotal = finalTotal;
+        sellingPriceDisplayedForExport = sellingDisplayed;
+
     } else {
         quoteCostPerPiece.innerText = '₱0.00';
         quoteSellingPrice.innerText = '₱0.00';
         quoteTotal.innerText = '₱0.00';
         currentQuoteTotal = 0;
+        sellingPriceDisplayedForExport = 0;
     }
 
     updateTotals();
@@ -530,17 +541,11 @@ addRawBtn.addEventListener('click', () => {
     const qtyInput = row.querySelector('.quantity-input');
     const removeBtn = row.querySelector('.remove-btn');
 
-    qtyInput.addEventListener('input', () => {
-        updateTotals();
-        updateQuotation();
-    });
-    removeBtn.addEventListener('click', () => {
-        row.remove();
-        updateTotals();
-        updateQuotation();
-    });
+    qtyInput.addEventListener('input', () => { updateTotals(); updateQuotation(); });
+    removeBtn.addEventListener('click', () => { row.remove(); updateTotals(); updateQuotation(); });
 
     updateTotals();
+    updateQuotation();
 });
 
 // ✅ when time changes (labor / overhead) update totals + quotation
@@ -580,7 +585,6 @@ function closeModal() {
     confirmationModal.style.display = 'none';
 }
 
-// ✅ confirmOrder with modal (no toaster/alert)
 function confirmOrder() {
     if (isSubmittingOrder) {
         openAlreadySavedModal();
@@ -621,7 +625,8 @@ function confirmOrder() {
             quantity: q,
             cost_per_piece: parseFloat(quoteCostPerPiece.innerText.replace(/[₱,]/g, '')) || 0,
             markup: parseFloat(document.getElementById('quoteMarkup').value) || 0,
-            selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
+            // ✅ use displayed selling price (matches UI)
+            selling_price_per_piece: sellingPriceDisplayedForExport || 0,
             discount_percentage: parseFloat(document.getElementById('quoteDiscount').value) || 0,
             total_price: total,
         }
@@ -712,7 +717,8 @@ function preparePdfData(event) {
     const data = {
         product: "{{ $product->name }}",
         quantity: qty,
-        selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
+        // ✅ use displayed selling price (matches UI)
+        selling_price_per_piece: sellingPriceDisplayedForExport || 0,
         discount: parseFloat(document.getElementById('quoteDiscount').value) || 0,
         total_price: total,
         customer: {
@@ -734,6 +740,7 @@ window.onclick = function(event) {
 
 // initial compute
 updateTotals();
+updateQuotation();
 </script>
 
 @endsection

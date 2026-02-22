@@ -107,8 +107,6 @@
                     <tr style="background:#fff;">
                         <td style="border:1px solid #e5e7eb; padding:0.75rem 1rem; font-weight:800; color:#111827;">
                             <span id="overallCost">₱0.00</span>
-                            <div style="margin-top:0.35rem; font-size:0.8rem; color:#6b7280;">
-                            </div>
                         </td>
 
                         <!-- Direct labor -->
@@ -222,7 +220,13 @@
                     <input type="number" id="quoteMarkup" step="0.01" value="0"
                         style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none; text-align: center;">
                 </td>
-                <td id="quoteSellingPrice" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; color:#000000; font-weight:700;" data-label="Selling Price">₱0.00</td>
+
+                <!-- ✅ Selling Price + Exact underneath -->
+                <td id="quoteSellingPrice" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; color:#000000; font-weight:700;" data-label="Selling Price">
+                    ₱0.00
+                    <div id="quoteSellingExact" style="margin-top:2px; font-size:0.75rem; color:#6b7280; font-weight:500;"></div>
+                </td>
+
                 <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Discount">
                     <input type="number" id="quoteDiscount" step="0.01" value="0"
                         style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; outline:none; text-align: center;">
@@ -232,7 +236,6 @@
         </tbody>
     </table>
 
-    <!-- ✅ OVERALL REVENUE moved here (under quotation table) -->
     <div style="margin-top:1.25rem; text-align:right;">
         <h3 style="font-size:1.125rem; font-weight:800; color:#1f2937; margin:0;">
             Overall Revenue: <span id="overallRevenue" style="color:#000000;">₱0.00</span>
@@ -426,7 +429,6 @@ function calculateOverhead() {
 }
 
 function updateTotals() {
-    // materials total
     let materialsTotal = 0;
     const rows = costingBody.querySelectorAll('tr');
 
@@ -450,9 +452,12 @@ function updateTotals() {
 
     overallCostEl.innerText = '₱' + totalCost.toFixed(2);
 
-    // revenue is displayed under quotation table now, but same element id
+    // same element id, under quotation now
     overallRevenueEl.innerText = '₱' + (totalCost + currentQuoteTotal).toFixed(2);
 }
+
+// ✅ store exact selling price for saving/export (avoids parsing textContent with "Exact")
+let exactSellingPriceForExport = 0;
 
 function updateQuotation() {
     const qty = parseFloat(quoteQty.value) || 0;
@@ -469,25 +474,38 @@ function updateQuotation() {
 
     const laborCost = calculateDirectLabor();
     const overheadCost = calculateOverhead();
-
     const overallCost = materialsCost + laborCost + overheadCost;
 
-    if(qty > 0) {
-        const costPerPiece = overallCost / qty;
-        const sellingPricePerPiece = costPerPiece + markup;
-        const totalSellingPrice = sellingPricePerPiece * qty;
-        const finalTotal = totalSellingPrice - (totalSellingPrice * (discount / 100));
+    // ✅ displayed cost per unit (rounded to 2dp)
+    const costPerPieceExact = qty > 0 ? (overallCost / qty) : 0;
+    const costPerPieceDisplayed = parseFloat(costPerPieceExact.toFixed(2));
 
-        quoteCostPerPiece.innerText = '₱' + costPerPiece.toFixed(2);
-        quoteSellingPrice.innerText = '₱' + sellingPricePerPiece.toFixed(2);
-        quoteTotal.innerText = '₱' + finalTotal.toFixed(2);
+    // ✅ selling price based on displayed cost per unit + markup
+    const sellingPriceDisplayed = parseFloat((costPerPieceDisplayed + markup).toFixed(2));
+
+    // ✅ totals based on displayed selling price (no hidden butal)
+    const grossTotal = qty * sellingPriceDisplayed;
+    const finalTotal = grossTotal - (grossTotal * (discount / 100));
+
+    // display
+    if (qty > 0) {
+        quoteCostPerPiece.innerText = '₱' + costPerPieceDisplayed.toFixed(2);
+
+        // Selling price cell simple (no exact)
+        quoteSellingPrice.innerText = '₱' + sellingPriceDisplayed.toFixed(2);
+
+        // total: remove .00 if whole
+        const finalShown = Number.isInteger(finalTotal) ? finalTotal.toFixed(0) : finalTotal.toFixed(2);
+        quoteTotal.innerText = '₱' + finalShown;
 
         currentQuoteTotal = finalTotal;
+        exactSellingPriceForExport = sellingPriceDisplayed; // export/save uses displayed selling
     } else {
         quoteCostPerPiece.innerText = '₱0.00';
         quoteSellingPrice.innerText = '₱0.00';
         quoteTotal.innerText = '₱0.00';
         currentQuoteTotal = 0;
+        exactSellingPriceForExport = 0;
     }
 
     updateTotals();
@@ -508,9 +526,8 @@ addRawBtn.addEventListener('click', () => {
 
     const row = document.createElement('tr');
     row.dataset.id = rawId;
-    row.classList.add('hover:bg-gray-50');
     row.innerHTML = `
-        <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem; word-wrap:break-word; overflow-wrap:break-word;" data-label="Raw Material">${rawName}</td>
+        <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Raw Material">${rawName}</td>
         <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Quantity">
             <input type="number" min="0" value="0" class="quantity-input" style="width:70px; padding:0.25rem 0.5rem; border:1px solid #d1d5db; border-radius:0.375rem; text-align: center;">
         </td>
@@ -519,7 +536,7 @@ addRawBtn.addEventListener('click', () => {
         </td>
         <td class="total-price" style="border:1px solid #e5e7eb; padding:0.5rem 1rem; font-weight:500;" data-label="Total Price">₱0.00</td>
         <td style="border:1px solid #e5e7eb; padding:0.5rem 1rem;" data-label="Action">
-            <button type="button" class="remove-btn" style="background-color: #ef4444; color: white; padding:0.25rem 0.5rem; border-radius:0.375rem; font-weight:500; cursor:pointer; transition:background-color .2s ease; border:none;">Remove</button>
+            <button type="button" class="remove-btn" style="background-color:#ef4444; color:white; padding:0.25rem 0.5rem; border-radius:0.375rem; border:none; cursor:pointer;">Remove</button>
         </td>
     `;
     costingBody.appendChild(row);
@@ -569,7 +586,6 @@ function closeModal() {
     confirmationModal.style.display = 'none';
 }
 
-// ✅ confirmOrder with anti-duplicate + modal
 function confirmOrder() {
     if (isSubmittingOrder) {
         openAlreadySavedModal();
@@ -610,7 +626,7 @@ function confirmOrder() {
             quantity: qty,
             cost_per_piece: parseFloat(quoteCostPerPiece.innerText.replace(/[₱,]/g, '')) || 0,
             markup: parseFloat(quoteMarkup.value) || 0,
-            selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
+            selling_price_per_piece: exactSellingPriceForExport || 0,
             discount_percentage: parseFloat(quoteDiscount.value) || 0,
             total_price: totalPrice,
         }
@@ -693,7 +709,7 @@ function preparePdfData(event) {
     const data = {
         service: "{{ $service->name }}",
         quantity: document.getElementById('quoteQty').value || 0,
-        selling_price_per_piece: parseFloat(quoteSellingPrice.innerText.replace(/[₱,]/g, '')) || 0,
+        selling_price_per_piece: exactSellingPriceForExport || 0,
         discount: parseFloat(document.getElementById('quoteDiscount').value) || 0,
         total_price: parseFloat(quoteTotal.innerText.replace(/[₱,]/g, '')) || 0,
         raw_materials: getRawMaterialData(),
